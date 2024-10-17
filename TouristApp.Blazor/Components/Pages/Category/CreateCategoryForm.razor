@@ -1,0 +1,65 @@
+﻿@using TouristApp.Blazor.Models
+@using TouristApp.Blazor.Services.Categories
+@using TouristApp.Blazor.Utils
+@inject ICategoryService CategoryService
+@inject IJSRuntime JS
+@inject NavigationManager NavManager
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+</head>
+
+<body class="flex-column">
+
+<section class="untitled-page2 categorySection" style="--src:url(../assets/38414e2776364ef6203ce0219080c1ab.png)">
+    <!-- Category management section -->
+    <div class="categoryContainer">
+        <div id="map" class="colorPreview"></div>
+        <div class="categoryDetails">
+            <form class="categoryForm">
+                <label class="categoryNameLabel" style="color:#000000">Название категории:</label>
+                <div class="categoryNameInput">
+                    <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_category.Name">
+                </div>
+                <label class="categoryDescriptionLabel" style="color:#000000">Описание:</label>
+                <div class="categoryNameInput">
+                    <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_category.Description">
+                </div>
+            </form>
+            <button class="addCategoryBtn" @onclick="CreateCategory">
+                <!-- TODO -->
+                Добавить
+            </button>
+        </div>
+    </div>
+</section>
+</body>
+</html>
+
+@code {
+    private Category _category = new();
+
+    async protected override Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender)
+        {
+            await Task.Delay(1000);
+            await JS.InvokeVoidAsync("init");
+        }
+    }
+
+    private async Task CreateCategory() {
+        if (_category.Name != string.Empty && _category.Description != string.Empty)
+        {
+            await CategoryService.Post(_category);
+
+            _category.Name = string.Empty;
+            _category.Description = string.Empty;
+            NavManager.ReloadPage();
+        } 
+    }
+}

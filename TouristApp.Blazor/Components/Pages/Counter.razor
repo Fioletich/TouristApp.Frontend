@@ -1,0 +1,33 @@
+﻿@page "/counter"
+@using TouristApp.Blazor.Models
+@using TouristApp.Blazor.Services.Categories
+@rendermode InteractiveServer
+@inject ICategoryService CategoryService
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @currentCount, Name of first category: @_nameOfFirstCategory</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-primary" @onclick="SetNameOfFirstCategory">Click me for name</button>
+
+<Map></Map>
+
+@code {
+    private int currentCount = 0;
+    private string _nameOfFirstCategory;
+
+    private void IncrementCount() {
+        currentCount++;
+    }
+
+    private async Task SetNameOfFirstCategory() {
+        _nameOfFirstCategory = (await CategoryService.GetAll())[0].Name;
+    }
+
+    private Models.Category[] GetAllCategories() {
+        return CategoryService.GetAll().Result.ToArray();
+    }
+}

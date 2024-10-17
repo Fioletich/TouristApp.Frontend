@@ -1,0 +1,132 @@
+﻿@using System.Text.Json
+@using TouristApp.Blazor.Models
+@using TouristApp.Blazor.Models.Pinpoints
+@using TouristApp.Blazor.Services.Categories
+@using TouristApp.Blazor.Services.Pinpoints
+@using TouristApp.Blazor.Services.PinpointCategoryService
+@using TouristApp.Blazor.Utils
+@inject IPinpointService PinpointService
+@inject ICategoryService CategoryService
+@inject IPinpointCategoryService PinpointCategoryService
+@inject IJSRuntime JS
+@inject NavigationManager NavManager
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+</head>
+<body class="flex-column">
+@if (_isLoaded)
+{
+    <section class="untitled-page mapCoordinatesSection" style="--src:url(../assets/38414e2776364ef6203ce0219080c1ab.png)">
+        <!-- Map coordinates and point details section -->
+        <div class="contentWrapper">
+            <figure id="map" class="mapPreview"></figure>
+            <div class="formContainer">
+                <div class="pointDetailsGroup">
+                    <p class="coordinatesLabel" style="color: #000000">Координаты точки:</p>
+                    <div class="coordinatesDisplay">
+                        <div>
+                            <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_pinpoint.XCoordinate">
+                        </div>
+                    </div>
+                    <div class="coordinatesDisplay">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_pinpoint.YCoordinate">
+                    </div>
+                    <p class="pointNameLabel" style="color: #000000">Название точки:</p>
+                    <div class="pointNameInput">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_pinpoint.Name">
+                    </div>
+                    <p class="descriptionLabel" style="color: #000000">Описание:</p>
+                    <div class="descriptionInput">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_pinpoint.Description">
+                    </div>
+                </div>
+                <button class="setPointBtn" type="submit" @onclick="SavePinpoint">
+                    Установить точку
+                </button>
+                <div class="actionGroup">
+
+                    <p class="categoryHeader" style="color: #000000">Добавить в категорию</p>
+                    <p class="categoryLabel" style="color: #000000">Категория:</p>
+                    <form>
+                        <select style="display:table-cell; width:100%; height: 100%; font-size: medium;" id="category-select" @bind="@_category.Id">
+                            <option value="00000000-0000-0000-0000-000000000000">Выберите категорию</option>
+                            @foreach (var category in _categories)
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        </select>
+                    </form>
+                </div>
+                <button class="addPointBtn" @onclick="AddCategory">
+                    <!-- TODO -->
+                    Добавить
+                </button>
+            </div>
+        </div>
+    </section>
+}
+</body>
+</html>
+
+@code {
+    private Category[] _categories;
+    private Category _category = new();
+    private StringPinpoint _pinpoint = new();
+    private bool _isLoaded;
+
+    async protected override Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender)
+        {
+            await Task.Delay(1000);
+            await JS.InvokeVoidAsync("init");
+        }
+    }
+
+    async protected override Task OnInitializedAsync() {
+        _categories = await CategoryService.GetAll();
+        _isLoaded = true;
+    }
+
+    private async Task SavePinpoint() {
+        if (_pinpoint.Name != string.Empty && _pinpoint.Description != string.Empty && _pinpoint.XCoordinate != string.Empty && _pinpoint.YCoordinate != string.Empty)
+        {
+            _pinpoint.Id = await PinpointService.Post(_pinpoint);
+
+            var pinpoint = new Pinpoint()
+            {
+                Name = _pinpoint.Name,
+                Description = _pinpoint.Description,
+                XCoordinate = Mapper.ConvertStringToDecimal(_pinpoint.XCoordinate),
+                YCoordinate = Mapper.ConvertStringToDecimal(_pinpoint.YCoordinate)
+            };
+            
+            await JS.InvokeVoidAsync("buildRoute",
+                JsonSerializer
+                    .Serialize(new[] { Mapper.MapJsPinpoint(pinpoint) }));
+            
+            _pinpoint.Name = string.Empty;
+            _pinpoint.Description = string.Empty;
+            _pinpoint.XCoordinate = string.Empty;
+            _pinpoint.YCoordinate = string.Empty;
+            
+            NavManager.ReloadPage();
+        }
+    }
+
+    private async Task AddCategory() {
+        if (_category.Id != Guid.Empty)
+        {
+            await PinpointCategoryService.Post(new PinpointCategory()
+            {
+                CategoryId = _category.Id,
+                PinpointId = _pinpoint.Id
+            });
+        }
+    }
+}

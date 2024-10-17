@@ -1,0 +1,7 @@
+D:\Works\ToristApp.Frontend\TouristApp.Blazor.exe
+D:\Works\ToristApp.Frontend\appsettings.Development.json
+D:\Works\ToristApp.Frontend\appsettings.json
+D:\Works\ToristApp.Frontend\TouristApp.Blazor.dll
+D:\Works\ToristApp.Frontend\TouristApp.Blazor.deps.json
+D:\Works\ToristApp.Frontend\TouristApp.Blazor.runtimeconfig.json
+D:\Works\ToristApp.Frontend\TouristApp.Blazor.pdb

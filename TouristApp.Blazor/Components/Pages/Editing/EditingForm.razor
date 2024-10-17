@@ -1,0 +1,177 @@
+﻿@using TouristApp.Blazor.Models
+@using TouristApp.Blazor.Models.Pinpoints
+@using TouristApp.Blazor.Services.Categories
+@using TouristApp.Blazor.Services.Pinpoints
+@using TouristApp.Blazor.Services.Routes
+@using TouristApp.Blazor.Utils
+@inject ICategoryService CategoryService
+@inject IPinpointService PinpointService
+@inject IRouteService RouteService
+@inject NavigationManager NavManager
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    
+</head>
+
+<body class="flex-column">
+@if (_isLoaded)
+{
+    <section class="untitled-page3 editDataSection" style="--src:url(../assets/38414e2776364ef6203ce0219080c1ab.png)">
+        <!-- Main section for editing entered data -->
+        <div class="editContentWrapper">
+            <h1 class="pageHeading" style="color:#000000">Редактирование введенных данных</h1>
+            <div class="editColumnsContainer">
+                <div class="pointEditColumn">
+                    <!-- Column for editing point data -->
+                    <h2 class="selectPointHeading" style="color:#000000">Выбрать точку:</h2>
+                    <form>
+                        <select style="display:table-cell; width:100%; height: 100%; font-size: medium;" id="category-select" @bind="@_pinpoint.Id">
+                            <option value="00000000-0000-0000-0000-000000000000">Выберите точку</option>
+                            @foreach (var pinpoint in _pinpoints)
+                            {
+                                <option value="@pinpoint.Id">@pinpoint.Name</option>
+                            }
+                        </select>
+                    </form>
+                    <h2 class="coordinatesHeading" style="color:#000000">Координаты точки:</h2>
+                    <div class="latitudeInput">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_pinpoint.XCoordinate">
+                    </div>
+                    <div class="longitudeInput">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_pinpoint.YCoordinate">
+                    </div>
+                    <h2 class="pointNameHeading" style="color:#000000">Название точки:</h2>
+                    <div class="pointNameInput">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_pinpoint.Name">
+                    </div>
+                    <h2 class="pointDescriptionHeading" style="color:#000000">Описание:</h2>
+                    <div class="pointDescriptionInput">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_pinpoint.Description">
+                    </div>
+                    <button class="savePointBtn" @onclick="UpdatePinpoint">
+                        <!-- TODO -->
+                        Сохранить изменения
+                    </button>
+                </div>
+                <div class="pathCategoryEditColumn">
+                    <!-- Column for editing path and category data -->
+                    <h2 class="selectPathHeading" style="color:#000000">Выбрать путь:</h2>
+                    <form>
+                        <select style="display:table-cell; width:100%; height: 100%; font-size: medium;" id="category-select" @bind="@_route.Id">
+                            <option value="00000000-0000-0000-0000-000000000000">Выберите маршрут</option>
+                            @foreach (var route in _routes)
+                            {
+                                <option value="@route.Id">@route.Name</option>
+                            }
+                        </select>
+                    </form>
+                    <h2 class="pathNameHeading" style="color:#000000">Название пути:</h2>
+                    <div class="pathNameInput">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_route.Name">
+                    </div>
+                    <h2 class="pathDescriptionHeading" style="color:#000000">Описание:</h2>
+                    <div class="pathDescriptionInput">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_route.Description">
+                    </div>
+                    <button class="savePathBtn" @onclick="UpdateRoute">
+                        <!-- TODO -->
+                        Сохранить изменения
+                    </button>
+                    <h2 class="selectCategoryHeading" style="color:#000000">Выбрать категорию:</h2>
+                    <form>
+                        <select style="display:table-cell; width:100%; height: 100%; font-size: medium;" id="category-select" @bind="@_category.Id">
+                            <option value="00000000-0000-0000-0000-000000000000">Выберите категорию</option>
+                            @foreach (var category in _categories)
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        </select>
+                    </form>
+                    <h2 class="categoryNameHeading" style="color:#000000">Название категории:</h2>
+                    <div class="categoryNameInput">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_category.Name">
+                    </div>
+                    <h2 class="categoryDescriptionHeading" style="color:#000000">Описание:</h2>
+                    <div class="categoryDescriptionInput">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_category.Description">
+                    </div>
+                    <button class="saveCategoryBtn" @onclick="UpdateCategory">
+                        <!-- TODO -->
+                        Сохранить изменения
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+</body>
+</html>
+
+@code {
+    private Category[] _categories;
+    private Pinpoint[] _pinpoints;
+    private Route[] _routes;
+    private Category _category = new();
+    private StringPinpoint _pinpoint = new();
+    private Route _route = new();
+    private bool _isLoaded;
+
+    async protected override Task OnInitializedAsync() {
+        _categories = await CategoryService.GetAll();
+        _pinpoints = await PinpointService.GetAll();
+        _routes = await RouteService.GetAll();
+        _isLoaded = true;
+    }
+
+    private async Task UpdatePinpoint() {
+        if (_pinpoint.Name != string.Empty && 
+            _pinpoint.Description != string.Empty && 
+            _pinpoint.XCoordinate != string.Empty &&
+            _pinpoint.YCoordinate != string.Empty && 
+            _pinpoint.Id != Guid.Empty)
+        {
+            await PinpointService.Update(_pinpoint);
+
+            _pinpoint.Name = string.Empty;
+            _pinpoint.Description = string.Empty;
+            _pinpoint.XCoordinate = string.Empty;
+            _pinpoint.YCoordinate = string.Empty;
+            
+            NavManager.ReloadPage();
+        }
+    }
+
+    private async Task UpdateRoute() {
+        if (_route.Name != string.Empty &&
+            _route.Description != string.Empty &&
+            _route.Id != Guid.Empty)
+        {
+            await RouteService.Update(_route);
+
+            _route.Name = string.Empty;
+            _route.Description = string.Empty;
+            
+            NavManager.ReloadPage();
+        }
+    }
+
+    private async Task UpdateCategory() {
+        if (_category.Name != string.Empty &&
+            _category.Description != string.Empty &&
+            _category.Id != Guid.Empty)
+        {
+            await CategoryService.Update(_category);
+
+            _category.Name = string.Empty;
+            _category.Description = string.Empty;
+            
+            NavManager.ReloadPage();
+        }
+    }
+}

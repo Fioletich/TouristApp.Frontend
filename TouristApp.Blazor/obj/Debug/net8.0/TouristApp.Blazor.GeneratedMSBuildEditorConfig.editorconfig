@@ -1,0 +1,99 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = TouristApp.Blazor
+build_property.RootNamespace = TouristApp.Blazor
+build_property.ProjectDir = D:\Works\RiderProjects\TouristApp.Frontendzip\TouristApp.Blazor\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = D:\Works\RiderProjects\TouristApp.Frontendzip\TouristApp.Blazor
+build_property._RazorSourceGeneratorDebug = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/App.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Pages/Category/CreateCategoryForm.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDYXRlZ29yeVxDcmVhdGVDYXRlZ29yeUZvcm0ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Pages/Category/CreateCategoryPage.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDYXRlZ29yeVxDcmVhdGVDYXRlZ29yeVBhZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Pages/Counter.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDb3VudGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Pages/CreatePinpointForm.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDcmVhdGVQaW5wb2ludEZvcm0ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Pages/Deleting/DeletingForm.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xEZWxldGluZ1xEZWxldGluZ0Zvcm0ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Pages/Deleting/DeletingPage.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xEZWxldGluZ1xEZWxldGluZ1BhZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Pages/Editing/EditingForm.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xFZGl0aW5nXEVkaXRpbmdGb3JtLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Pages/Editing/EditingPage.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xFZGl0aW5nXEVkaXRpbmdQYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Pages/Error.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xFcnJvci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Pages/Home.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xIb21lLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Pages/Pinpoint/CreatePinpointPage.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xQaW5wb2ludFxDcmVhdGVQaW5wb2ludFBhZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Pages/Pinpoint/CreatePinpointsForm.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xQaW5wb2ludFxDcmVhdGVQaW5wb2ludHNGb3JtLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Pages/Route/CreateRouteForm.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xSb3V0ZVxDcmVhdGVSb3V0ZUZvcm0ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Pages/Route/CreateRoutePage.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xSb3V0ZVxDcmVhdGVSb3V0ZVBhZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Pages/TouristRoute.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xUb3VyaXN0Um91dGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Routes.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xSb3V0ZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xfSW1wb3J0cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Layout/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTWFpbkxheW91dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-4fe0jb46d6
+
+[D:/Works/RiderProjects/TouristApp.Frontendzip/TouristApp.Blazor/Components/Layout/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTmF2TWVudS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-5s2kimnyyw

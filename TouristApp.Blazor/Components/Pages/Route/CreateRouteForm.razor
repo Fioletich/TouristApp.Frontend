@@ -1,0 +1,143 @@
+﻿@using System.Text.Json
+@using TouristApp.Blazor.Models
+@using TouristApp.Blazor.Models.Pinpoints
+@using TouristApp.Blazor.Services.Pinpoints
+@using TouristApp.Blazor.Services.Routes
+@using TouristApp.Blazor.Services.TouristRoutes
+@using TouristApp.Blazor.Utils
+@inject IRouteService RouteService 
+@inject IPinpointService PinpointService 
+@inject ITouristRouteService TouristRouteService
+@inject IJSRuntime JS
+@inject NavigationManager NavManager
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+</head>
+
+<body class="flex-column">
+@if (_isLoaded)
+{
+    <section class="untitled-page1 routeManagementSection" style="--src:url(../assets/38414e2776364ef6203ce0219080c1ab.png)">
+        <!-- Route Management Section -->
+        <div class="contentWrapper">
+            <aside class="sidebarContainer" id="map"></aside>
+            <main class="mainContentContainer">
+                <div class="routeInfoContainer">
+                    <p class="routeNameLabel" style="color: #000000">Название пути:</p>
+                    <div class="routeNameInput">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_route.Name">
+                    </div>
+                    <p class="routeDescriptionLabel" style="color: #000000">Описание:</p>
+                    <div class="routeDescriptionInput">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_route.Description">
+                    </div>
+                </div>
+                <div class="routeActionContainer">
+                    <button class="addRouteBtn" @onclick="CreateRoute">
+                        <!-- TODO -->
+                        Добавить
+                    </button>
+                    <p class="linkRoutePointTitle" style="color: #000000">Связать путь и точку</p>
+                    <p class="routeListLabel" style="color: #000000">Список путей:</p>
+                    <form>
+                        <select style="display:table-cell; width:100%; height: 100%; font-size: medium;" id="category-select" @bind="@_selectedRoute.Id">
+                            <option value="00000000-0000-0000-0000-000000000000">Выберите маршрут</option>
+                            @foreach (var route in _routes)
+                            {
+                            <option value="@route.Id">@route.Name</option>
+                            }
+                        </select>
+                    </form>
+                    <p class="pointListLabel" style="color: #000000">Список точек:</p>
+                    <form>
+                        <select style="display:table-cell; width:100%; height: 100%; font-size: medium;" id="category-select" @bind="@_selectedPinpoint.Id">
+                            <option value="00000000-0000-0000-0000-000000000000">Выберите точку</option>
+                            @foreach (var pinpoint in _pinpoints)
+                            {
+                            <option value="@pinpoint.Id">@pinpoint.Name</option>
+                            }
+                        </select>
+                    </form>
+                </div>
+                <button class="confirmBtn" @onclick="CreateTouristRoute">
+                    <!-- TODO -->
+                    Подтвердить
+                </button>
+            </main>
+        </div>
+    </section>
+}
+</body>
+</html>
+
+@code {
+    private Route _route = new();
+    private Route _selectedRoute = new();
+    private Pinpoint _selectedPinpoint = new();
+    private Route[] _routes;
+    private Pinpoint[] _pinpoints;
+    private bool _isLoaded;
+
+    async protected override Task OnInitializedAsync() {
+        _routes = await RouteService.GetAll();
+        _pinpoints = await PinpointService.GetAll();
+        _isLoaded = true;
+    }
+
+    async protected override Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender)
+        {
+            await Task.Delay(1000);
+            await JS.InvokeVoidAsync("init");
+        }
+    }
+
+    private async Task CreateRoute() {
+        if (_route.Name != string.Empty && _route.Description != string.Empty)
+        {
+            await RouteService.Post(_route);
+
+            _route.Name = string.Empty;
+            _route.Description = string.Empty;
+            
+            NavManager.ReloadPage();
+        }
+    }
+
+    private async Task CreateTouristRoute() {
+        if (_selectedRoute.Id != Guid.Empty && _selectedPinpoint.Id != Guid.Empty)
+        {
+            await TouristRouteService.Post(new TouristRoute()
+            {
+                PinpointId = _selectedPinpoint.Id,
+                RouteId = _selectedRoute.Id
+            });
+
+            await BuildRoute(_selectedRoute.Id);
+            
+            NavManager.ReloadPage();
+        }
+    }
+
+    private async Task BuildRoute(Guid routeId) {
+        var route = await RouteService.Get(routeId);
+
+        var touristRoutes = (await TouristRouteService.GetAll())
+            .Where(tr => tr.RouteId == route.Id);
+        var pinPoints = new List<JSPinpoint>();
+
+        foreach (var touristRoute in touristRoutes)
+        {
+            pinPoints.Add(Mapper.MapJsPinpoint((await PinpointService.Get(touristRoute.PinpointId))));
+        }
+
+
+        await JS.InvokeVoidAsync("buildRoute", JsonSerializer.Serialize(pinPoints));
+    }
+}

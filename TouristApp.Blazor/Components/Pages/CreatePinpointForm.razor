@@ -1,0 +1,176 @@
+﻿@inject IPinpointService PinpointService
+@inject ICategoryService CategoryService
+@inject IRouteService RouteService
+@inject ITouristRouteService TouristRouteService
+@inject IJSRuntime JS
+@using System.Text.Json
+@using TouristApp.Blazor.Models
+@using TouristApp.Blazor.Models.Pinpoints
+@using TouristApp.Blazor.Services.Categories
+@using TouristApp.Blazor.Services.Pinpoints
+@using TouristApp.Blazor.Services.Routes
+@using TouristApp.Blazor.Services.TouristRoutes
+@using TouristApp.Blazor.Utils
+@using Syncfusion.Blazor.DropDowns
+
+<section class="test routePlannerSection" style="--src:url(./assets/38414e2776364ef6203ce0219080c1ab.png)">
+    <!-- Route planner section -->
+    <div class="contentWrapper">
+        <aside id="map" class="leftSidebar"></aside>
+        @if (_isLoaded)
+        {
+            <main class="mainContent">
+            <div class="readyRouteContainer">
+                <h2 class="readyRouteHeading" style="color: #000000">Выбор маршрута</h2>
+                <h3 class="routeListHeading" style="color: #000000">Список маршрутов:</h3>
+            </div>
+            <div class="customRouteContainer">
+                <div class="customRouteBackground">
+                    <!--<input type="text" style="display:table-cell; width:100%; height: 100%; font-size: medium;"/>-->
+                    <form>
+                        <select style="display:table-cell; width:100%; height: 100%; font-size: medium;" id="category-select" @bind="@_route.Id">
+                            <option value="00000000-0000-0000-0000-000000000000">Выберите маршрут</option>
+                            @foreach (var route in _routes)
+                            {
+                                <option value="@route.Id">@route.Name</option>
+                            }
+                        </select>
+                    </form>
+                    
+                </div>
+                <button class="saveRouteBtn" type="submit" @onclick="BuildRoute">
+                    <!-- TODO -->
+                    Показать!
+                </button>
+                <h2 class="createCustomHeading" style="color: #000000">Создать собственный!</h2>
+                <h3 class="coordinatesHeading" style="color: #000000">Координаты точки:</h3>
+            </div>
+            <div class="pointNameContainer">
+                <div class="pointNameBackground">
+                    <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_pinpoint.XCoordinate">
+                </div>
+                <div class="pointNameInputBackground">
+                    <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_pinpoint.YCoordinate">
+                </div>
+                <h3 class="pointNameHeading" style="color: #000000">Название точки:</h3>
+            </div>
+            <div class="descriptionContainer">
+                <div class="descriptionBackground">
+                    <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_pinpoint.Name">
+                </div>
+                <h3 class="descriptionHeading" style="color: #000000">Описание:</h3>
+            </div>
+            <div class="categoryContainer">
+                <div class="categoryBackground">
+                    <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_pinpoint.Description">
+                </div>
+                <h3 class="categoryIdHeading" style="color: #000000">Категория:</h3>
+            </div>
+            <div class="setPointBackground">
+                
+            </div>
+            <button class="setPointBtn" type="submit" @onclick="OnSaveClick">
+                Установить точку
+            </button>
+            <div class="routeInfoContainer">
+                <h3 class="routeNameHeading" style="color: #000000">Название маршрута:</h3>
+                <div class="routeNameInputBackground">
+                    <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_route.Name">
+                </div>
+                <h3 class="routeDescriptionHeading" style="color: #000000">Описание:</h3>
+                <div class="routeDescriptionInputBackground">
+                    <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_route.Description">
+                </div>
+            </div>
+            <button class="saveRouteBtn" type="submit" @onclick="CreateRoute">
+                <!-- TODO -->
+                Сохранить!
+            </button>
+        </main>
+        }
+        else
+        {
+            <p>Loading...</p>
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter] public IEnumerable<Models.Category> Categories { get; set; }
+    private IEnumerable<Models.Route> _routes;
+    private StringPinpoint _pinpoint = new();
+    private Models.Route _route = new();
+    private bool _isLoaded;
+    private bool _isUploaded;
+
+    async protected override Task OnInitializedAsync() {
+        _routes = await GetRoutes();
+        _isLoaded = true;
+    }
+
+    private async Task<IEnumerable<Models.Route>> GetRoutes() {
+        return await RouteService.GetAll();
+    }
+    private void HandlePinpointForm() {
+        PinpointService.Post(_pinpoint);
+    }
+
+    private async Task OnSaveClick() {
+        if (_route.Id != Guid.Empty)
+        {
+            var pinpointGuid = await PinpointService.Post(_pinpoint);
+
+            var touristRouteGuid = await TouristRouteService.Post(new Models.TouristRoute()
+            {
+                RouteId = _route.Id,
+                PinpointId = pinpointGuid
+            });
+
+            _pinpoint.Name = "";
+            _pinpoint.Description = "";
+            _pinpoint.YCoordinate = default;
+            _pinpoint.XCoordinate = default;
+        }
+    }
+
+    private async Task BuildRoute() {
+        if (_route.Id != Guid.Empty)
+        {
+            var route = await RouteService.Get(_route.Id);
+
+            var touristRoutes = (await TouristRouteService.GetAll())
+                .Where(tr => tr.RouteId == route.Id);
+            var pinPoints = new List<JSPinpoint>();
+
+            foreach (var touristRoute in touristRoutes)
+            {
+                pinPoints.Add(Mapper.MapJsPinpoint((await PinpointService.Get(touristRoute.PinpointId))));
+            }
+
+
+            await JS.InvokeVoidAsync("buildRoute", JsonSerializer.Serialize(pinPoints));
+        }
+    }
+    private async Task CreateRoute()
+    {
+        //if (_pinpoint.CategoryId != Guid.Empty)
+        //{
+            var routeGuid = await RouteService.Post(_route);
+            var pinpointGuid = await PinpointService.Post(_pinpoint);
+
+            await TouristRouteService.Post(new Models.TouristRoute
+            {
+                RouteId = routeGuid,
+                PinpointId = pinpointGuid
+            });
+
+            _route.Description = "";
+            _route.Name = "";
+
+            _pinpoint.Name = "";
+            _pinpoint.Description = "";
+            _pinpoint.XCoordinate = default;
+            _pinpoint.YCoordinate = default;
+        //}
+    }
+}

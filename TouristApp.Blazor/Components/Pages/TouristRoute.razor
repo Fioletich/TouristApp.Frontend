@@ -1,0 +1,60 @@
+﻿@page "/TouristRoute"
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+@inject IRouteService RouteService
+@inject IPinpointService PinpointService
+@inject ICategoryService CategoryService
+@using System.Text.Json
+@using TouristApp.Blazor.Models
+@using TouristApp.Blazor.Models.Pinpoints
+@using TouristApp.Blazor.Services.Categories
+@using TouristApp.Blazor.Services.Pinpoints
+@using TouristApp.Blazor.Services.Routes
+@using TouristApp.Blazor.Utils
+
+@if (_isLoaded)
+{
+    <CreatePinpointForm Categories="@_categories" />
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    private IEnumerable<Models.Category> _categories;
+    private bool _isLoaded;
+
+    async protected override Task OnInitializedAsync() {
+        _categories = await GetCategoriesAsync();
+        _isLoaded = true;
+    }
+
+    async protected override Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender)
+        {
+            await Task.Delay(1000);
+            await JS.InvokeVoidAsync("init");
+            
+            //await JS.InvokeVoidAsync("buildRoute",
+            //JsonSerializer.Serialize(jsPinpoints));
+        }
+        
+        
+        var pinpoints = await PinpointService.GetAll();
+        var jsPinpoints = new List<JSPinpoint>();
+
+        foreach (var pinpoint in pinpoints)
+        {
+            jsPinpoints.Add(Mapper.MapJsPinpoint(pinpoint));
+        }
+    }
+
+    private async Task<IEnumerable<Models.Category>> GetCategoriesAsync() {
+        return await CategoryService.GetAll();
+    }
+
+    private async Task<IEnumerable<Models.Route>> GetRoutesAsync() {
+        return await RouteService.GetAll();
+    }
+}
