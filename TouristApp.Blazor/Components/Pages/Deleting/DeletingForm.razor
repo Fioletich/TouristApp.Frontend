@@ -6,7 +6,6 @@
 @using TouristApp.Blazor.Services.Routes
 @using TouristApp.Blazor.Services.TouristRoutes
 @using TouristApp.Blazor.Utils
-@using TouristRoute = TouristApp.Blazor.Components.Pages.TouristRoute
 @inject ICategoryService CategoryService
 @inject IPinpointService PinpointService
 @inject IRouteService RouteService
@@ -92,7 +91,7 @@
     private Category[] _categories;
     private Pinpoint[] _pinpoints;
     private Route[] _routes;
-    private Models.TouristRoute[] _touristRoutes;
+    private TouristRoute[] _touristRoutes;
     private PinpointCategory[] _pinpointCategories;
     private Category _category = new();
     private StringPinpoint _pinpoint = new();

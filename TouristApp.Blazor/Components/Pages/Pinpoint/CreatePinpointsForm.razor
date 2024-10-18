@@ -76,8 +76,8 @@
 
 @code {
     private Category[] _categories;
-    private Category _category = new();
-    private StringPinpoint _pinpoint = new();
+    private Category _category;
+    private StringPinpoint _pinpoint;
     private bool _isLoaded;
 
     async protected override Task OnAfterRenderAsync(bool firstRender) {
@@ -89,6 +89,16 @@
     }
 
     async protected override Task OnInitializedAsync() {
+        _pinpoint = new StringPinpoint()
+        {
+            Name = string.Empty,
+            Description = string.Empty,
+            XCoordinate = string.Empty,
+            YCoordinate = string.Empty
+        };
+
+        _category = new Category();
+        
         _categories = await CategoryService.GetAll();
         _isLoaded = true;
     }

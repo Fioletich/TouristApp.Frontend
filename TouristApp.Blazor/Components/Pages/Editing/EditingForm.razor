@@ -1,4 +1,5 @@
-﻿@using TouristApp.Blazor.Models
+﻿@using System.Globalization
+@using TouristApp.Blazor.Models
 @using TouristApp.Blazor.Models.Pinpoints
 @using TouristApp.Blazor.Services.Categories
 @using TouristApp.Blazor.Services.Pinpoints
@@ -63,7 +64,7 @@
                     <!-- Column for editing path and category data -->
                     <h2 class="selectPathHeading" style="color:#000000">Выбрать путь:</h2>
                     <form>
-                        <select style="display:table-cell; width:100%; height: 100%; font-size: medium;" id="category-select" @bind="@_route.Id">
+                        <select style="display:table-cell; width:100%; height: 100%; font-size: medium;" id="category-select" @bind="_route.Id">
                             <option value="00000000-0000-0000-0000-000000000000">Выберите маршрут</option>
                             @foreach (var route in _routes)
                             {
@@ -117,15 +118,36 @@
     private Category[] _categories;
     private Pinpoint[] _pinpoints;
     private Route[] _routes;
-    private Category _category = new();
+    private Category _category;
     private StringPinpoint _pinpoint = new();
     private Route _route = new();
     private bool _isLoaded;
 
     async protected override Task OnInitializedAsync() {
+        _category = new Category
+        {
+            Name = string.Empty,
+            Description = string.Empty
+        };
+
+        _pinpoint = new StringPinpoint
+        {
+            Name = string.Empty,
+            Description = string.Empty,
+            XCoordinate = string.Empty,
+            YCoordinate = string.Empty
+        };
+
+        _route = new Route()
+        {
+            Name = string.Empty,
+            Description = string.Empty
+        };
+
         _categories = await CategoryService.GetAll();
         _pinpoints = await PinpointService.GetAll();
         _routes = await RouteService.GetAll();
+        
         _isLoaded = true;
     }
 
@@ -136,6 +158,7 @@
             _pinpoint.YCoordinate != string.Empty && 
             _pinpoint.Id != Guid.Empty)
         {
+            
             await PinpointService.Update(_pinpoint);
 
             _pinpoint.Name = string.Empty;
@@ -144,6 +167,22 @@
             _pinpoint.YCoordinate = string.Empty;
             
             NavManager.ReloadPage();
+        }
+
+        if (_pinpoint.Id != Guid.Empty)
+        {
+            var pinpoint = await PinpointService.Get(_pinpoint.Id);
+
+            _pinpoint.Name = pinpoint.Name;
+            _pinpoint.Description = pinpoint.Description;
+            _pinpoint.XCoordinate = pinpoint.XCoordinate
+                .ToString(CultureInfo.InvariantCulture)
+                .Replace(',', '.');
+            _pinpoint.YCoordinate = pinpoint.YCoordinate
+                .ToString(CultureInfo.InvariantCulture)
+                .Replace(',', '.');
+            
+            return;
         }
     }
 
@@ -159,6 +198,14 @@
             
             NavManager.ReloadPage();
         }
+
+        if (_route.Id != Guid.Empty)
+        {
+            var route = await RouteService.Get(_route.Id);
+
+            _route.Name = route.Name;
+            _route.Description = route.Description;
+        }
     }
 
     private async Task UpdateCategory() {
@@ -172,6 +219,14 @@
             _category.Description = string.Empty;
             
             NavManager.ReloadPage();
+        }
+
+        if (_category.Id != Guid.Empty)
+        {
+            var category = await CategoryService.Get(_category.Id);
+
+            _category.Name = category.Name;
+            _category.Description = category.Description;
         }
     }
 }

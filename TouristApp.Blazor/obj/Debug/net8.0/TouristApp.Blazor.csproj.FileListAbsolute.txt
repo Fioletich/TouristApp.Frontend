@@ -108,3 +108,4 @@ D:\Works\RiderProjects\TouristApp.Frontendzip\TouristApp.Blazor\bin\Debug\net8.0
 D:\Works\RiderProjects\TouristApp.Frontendzip\TouristApp.Blazor\bin\Debug\net8.0\System.Text.Json.dll
 D:\Works\RiderProjects\TouristApp.Frontendzip\TouristApp.Blazor\obj\Debug\net8.0\TouristApp.Blazor.csproj.AssemblyReference.cache
 D:\Works\RiderProjects\TouristApp.Frontendzip\TouristApp.Blazor\obj\Debug\net8.0\TouristA.B84D44D3.Up2Date
+D:\Works\RiderProjects\TouristApp.Frontendzip\TouristApp.Blazor\obj\Debug\net8.0\TouristApp.Blazor.sourcelink.json

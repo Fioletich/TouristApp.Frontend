@@ -69,6 +69,23 @@
                     <!-- TODO -->
                     Подтвердить
                 </button>
+                <div>
+                    <p class="linkRoutePointTitle" style="color: #000000">Показать маршрут</p>
+                    <p class="routeListLabel" style="color: #000000">Список маршрутов:</p>
+                    <form>
+                        <select style="display:table-cell; width:100%; height: 100%; font-size: medium;" id="category-select" @bind="@_buildRoute.Id">
+                            <option value="00000000-0000-0000-0000-000000000000">Выберите маршрут</option>
+                            @foreach (var route in _routes)
+                            {
+                                <option value="@route.Id">@route.Name</option>
+                            }
+                        </select>
+                    </form>
+                    <button class="confirmBtn" @onclick="ShowRoute">
+                        <!-- TODO -->
+                        Показать
+                    </button>
+                </div>
             </main>
         </div>
     </section>
@@ -77,14 +94,35 @@
 </html>
 
 @code {
-    private Route _route = new();
-    private Route _selectedRoute = new();
-    private Pinpoint _selectedPinpoint = new();
+    private Route _route;
+    private Route _selectedRoute;
+    private Pinpoint _selectedPinpoint;
+    private Route _buildRoute;
     private Route[] _routes;
     private Pinpoint[] _pinpoints;
     private bool _isLoaded;
 
     async protected override Task OnInitializedAsync() {
+        _route = new Route()
+        {
+            Name = string.Empty,
+            Description = string.Empty
+        };
+
+        _selectedRoute = new Route()
+        {
+            Name = string.Empty,
+            Description = string.Empty
+        };
+
+        _selectedPinpoint = new Pinpoint()
+        {
+            Name = string.Empty,
+            Description = string.Empty,
+        };
+
+        _buildRoute = new Route();
+        
         _routes = await RouteService.GetAll();
         _pinpoints = await PinpointService.GetAll();
         _isLoaded = true;
@@ -120,11 +158,13 @@
             });
 
             await BuildRoute(_selectedRoute.Id);
-            
-            NavManager.ReloadPage();
         }
     }
-
+    
+    private async Task ShowRoute() {
+        await BuildRoute(_buildRoute.Id);
+    }
+    
     private async Task BuildRoute(Guid routeId) {
         var route = await RouteService.Get(routeId);
 
@@ -136,7 +176,6 @@
         {
             pinPoints.Add(Mapper.MapJsPinpoint((await PinpointService.Get(touristRoute.PinpointId))));
         }
-
 
         await JS.InvokeVoidAsync("buildRoute", JsonSerializer.Serialize(pinPoints));
     }
