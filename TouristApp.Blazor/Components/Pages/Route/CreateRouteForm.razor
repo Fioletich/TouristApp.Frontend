@@ -29,19 +29,60 @@
             <aside class="sidebarContainer" id="map"></aside>
             <main class="mainContentContainer">
                 <div class="routeInfoContainer">
+                    <p class="linkRoutePointTitle" style="color: #000000">Создать путь</p>
                     <p class="routeNameLabel" style="color: #000000">Название пути:</p>
                     <div class="routeNameInput">
-                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_route.Name">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" placeholder="Название:" @bind-value="@_routeForCreate.Name">
                     </div>
                     <p class="routeDescriptionLabel" style="color: #000000">Описание:</p>
                     <div class="routeDescriptionInput">
-                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" @bind-value="@_route.Description">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" placeholder="Описание:" @bind-value="@_routeForCreate.Description">
                     </div>
                 </div>
                 <div class="routeActionContainer">
                     <button class="addRouteBtn" @onclick="CreateRoute">
                         <!-- TODO -->
                         Добавить
+                    </button>
+                    <!-- Column for editing path and category data -->
+                    <p class="linkRoutePointTitle" style="color: #000000">Изменить маршрут</p>
+                    <p class="routeListLabel" style="color: #000000">Список маршрутов:</p>
+                    <form>
+                        <select style="display:table-cell; width:100%; height: 100%; font-size: medium;" id="category-select" @bind="_routeForUpdate.Id">
+                            <option value="00000000-0000-0000-0000-000000000000">Выберите маршрут</option>
+                            @foreach (var route in _routes)
+                            {
+                            <option value="@route.Id">@route.Name</option>
+                            }
+                        </select>
+                    </form>
+                    <h2 class="routeListLabel" style="color:#000000">Название пути:</h2>
+                    <div class="pathNameInput">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" placeholder="Название:" @bind-value="@_routeForUpdate.Name">
+                    </div>
+                    <h2 class="routeListLabel" style="color:#000000">Описание:</h2>
+                    <div class="pathDescriptionInput">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" placeholder="Описание:" @bind-value="@_routeForUpdate.Description">
+                    </div>
+                    <button class="confirmBtn" @onclick="UpdateRoute">
+                        <!-- TODO -->
+                        Сохранить изменения
+                    </button>
+                    <!-- Column for editing path and category data -->
+                    <p class="linkRoutePointTitle" style="color: #000000">Удалить маршрут</p>
+                    <h2 class="routeListLabel" style="color:#000000">Выбрать маршрут:</h2>
+                    <form>
+                        <select style="display:table-cell; width:100%; height: 100%; font-size: medium;" id="category-select" @bind="@_routeForDelete.Id">
+                            <option value="00000000-0000-0000-0000-000000000000">Выберите маршрут</option>
+                            @foreach (var route in _routes)
+                            {
+                            <option value="@route.Id">@route.Name</option>
+                            }
+                        </select>
+                    </form>
+                    <button class="confirmBtn" @onclick="DeleteRoute">
+                        <!-- TODO -->
+                        Удалить
                     </button>
                     <p class="linkRoutePointTitle" style="color: #000000">Связать путь и точку</p>
                     <p class="routeListLabel" style="color: #000000">Список путей:</p>
@@ -77,7 +118,7 @@
                             <option value="00000000-0000-0000-0000-000000000000">Выберите маршрут</option>
                             @foreach (var route in _routes)
                             {
-                                <option value="@route.Id">@route.Name</option>
+                            <option value="@route.Id">@route.Name</option>
                             }
                         </select>
                     </form>
@@ -94,16 +135,34 @@
 </html>
 
 @code {
-    private Route _route;
+    private Route _routeForCreate;
+    private Route _routeForUpdate;
+    private Route _routeForDelete;
     private Route _selectedRoute;
-    private Pinpoint _selectedPinpoint;
     private Route _buildRoute;
     private Route[] _routes;
+    
+    private Pinpoint _selectedPinpoint;
     private Pinpoint[] _pinpoints;
+
+    private TouristRoute[] _touristRoutes;
+    
     private bool _isLoaded;
 
     async protected override Task OnInitializedAsync() {
-        _route = new Route()
+        _routeForCreate = new Route()
+        {
+            Name = string.Empty,
+            Description = string.Empty
+        };
+        
+        _routeForUpdate = new Route()
+        {
+            Name = string.Empty,
+            Description = string.Empty
+        };
+        
+        _routeForDelete = new Route()
         {
             Name = string.Empty,
             Description = string.Empty
@@ -125,6 +184,8 @@
         
         _routes = await RouteService.GetAll();
         _pinpoints = await PinpointService.GetAll();
+        _touristRoutes = await TouristRouteService.GetAll();
+            
         _isLoaded = true;
     }
 
@@ -137,12 +198,12 @@
     }
 
     private async Task CreateRoute() {
-        if (_route.Name != string.Empty && _route.Description != string.Empty)
+        if (_routeForCreate.Name != string.Empty && _routeForCreate.Description != string.Empty)
         {
-            await RouteService.Post(_route);
+            await RouteService.Post(_routeForCreate);
 
-            _route.Name = string.Empty;
-            _route.Description = string.Empty;
+            _routeForCreate.Name = string.Empty;
+            _routeForCreate.Description = string.Empty;
             
             NavManager.ReloadPage();
         }
@@ -178,5 +239,45 @@
         }
 
         await JS.InvokeVoidAsync("buildRoute", JsonSerializer.Serialize(pinPoints));
+    }
+    
+    private async Task UpdateRoute() {
+        if (_routeForUpdate.Name != string.Empty &&
+            _routeForUpdate.Description != string.Empty &&
+            _routeForUpdate.Id != Guid.Empty)
+        {
+            await RouteService.Update(_routeForUpdate);
+
+            _routeForUpdate.Name = string.Empty;
+            _routeForUpdate.Description = string.Empty;
+            
+            NavManager.ReloadPage();
+        }
+
+        if (_routeForUpdate.Id != Guid.Empty)
+        {
+            var route = await RouteService.Get(_routeForUpdate.Id);
+
+            _routeForUpdate.Name = route.Name;
+            _routeForUpdate.Description = route.Description;
+        }
+    }
+    
+    private async Task DeleteRoute() {
+        if (_routeForDelete.Id != Guid.Empty)
+        {
+            await RouteService.Delete(_routeForDelete.Id);
+            
+            var trsids = _touristRoutes
+                .Where(tr => tr.RouteId == _routeForDelete.Id)
+                .Select(tr => tr.Id);
+
+            foreach (var id in trsids)
+            {
+                await TouristRouteService.Delete(id);
+            }
+            
+            NavManager.ReloadPage();
+        }
     }
 }
