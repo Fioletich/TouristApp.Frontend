@@ -118,10 +118,14 @@
                             <option value="00000000-0000-0000-0000-000000000000">Выберите маршрут</option>
                             @foreach (var route in _routes)
                             {
-                            <option value="@route.Id">@route.Name</option>
+                                <option value="@route.Id">@route.Name</option>
                             }
                         </select>
                     </form>
+                    <p class="routeListLabel" style="color: #000000">Координаты первой точки (необязательно):</p>
+                    <div class="pathDescriptionInput">
+                        <input style="display:table-cell; width:100%; height: 100%; font-size: medium;" type="text" placeholder="Координаты первой точки: X.xxxxxx, Y.yyyyyy" @bind-value="@_firstPinpointToBuild">
+                    </div>
                     <button class="confirmBtn" @onclick="ShowRoute">
                         <!-- TODO -->
                         Показать
@@ -143,6 +147,7 @@
     private Route[] _routes;
     
     private Pinpoint _selectedPinpoint;
+    private string _firstPinpointToBuild;
     private Pinpoint[] _pinpoints;
 
     private TouristRoute[] _touristRoutes;
@@ -179,6 +184,8 @@
             Name = string.Empty,
             Description = string.Empty,
         };
+
+        _firstPinpointToBuild = string.Empty;
 
         _buildRoute = new Route();
         
@@ -223,21 +230,43 @@
     }
     
     private async Task ShowRoute() {
+        if (_firstPinpointToBuild != string.Empty)
+        {
+            await BuildRoute(_buildRoute.Id, _firstPinpointToBuild);
+            return;
+        }
         await BuildRoute(_buildRoute.Id);
     }
     
-    private async Task BuildRoute(Guid routeId) {
+    private async Task BuildRoute(Guid routeId , string? firstPinpoint = null) {
         var route = await RouteService.Get(routeId);
 
         var touristRoutes = (await TouristRouteService.GetAll())
             .Where(tr => tr.RouteId == route.Id);
         var pinPoints = new List<JSPinpoint>();
 
+        if (firstPinpoint is not null)
+        {
+            string[] firstPinpointCoords = _firstPinpointToBuild.Trim().Split(',');
+            
+            var jsPinpoint = new JSPinpoint()
+            {
+                Coords = new[] { Convert.ToDecimal(firstPinpointCoords[0].Replace('.', ',')),
+                    Convert.ToDecimal(firstPinpointCoords[1].Replace('.', ',')) },
+                Images = new[] { "" },
+                Info = "Маршрут от первой точки"
+            };
+            
+            pinPoints.Add(jsPinpoint);
+        }
+        
         foreach (var touristRoute in touristRoutes)
         {
             pinPoints.Add(Mapper.MapJsPinpoint((await PinpointService.Get(touristRoute.PinpointId))));
         }
 
+        pinPoints = pinPoints.ToArray().OrderByCoords().ToList();
+        
         await JS.InvokeVoidAsync("buildRoute", JsonSerializer.Serialize(pinPoints));
     }
     

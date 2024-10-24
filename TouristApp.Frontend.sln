@@ -5,6 +5,8 @@ VisualStudioVersion = 17.10.35027.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TouristApp.Blazor", "TouristApp.Blazor\TouristApp.Blazor.csproj", "{0B183543-C6E7-456F-AF78-74F2DB31449C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp2", "ConsoleApp2\ConsoleApp2.csproj", "{0968F177-909A-4D36-8CF1-AAFCA94FFC42}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{0B183543-C6E7-456F-AF78-74F2DB31449C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B183543-C6E7-456F-AF78-74F2DB31449C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B183543-C6E7-456F-AF78-74F2DB31449C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0968F177-909A-4D36-8CF1-AAFCA94FFC42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0968F177-909A-4D36-8CF1-AAFCA94FFC42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0968F177-909A-4D36-8CF1-AAFCA94FFC42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0968F177-909A-4D36-8CF1-AAFCA94FFC42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
