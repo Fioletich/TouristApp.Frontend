@@ -1,0 +1,331 @@
+﻿@using System.Text.Json
+@using TouristApp.Blazor.Models
+@using TouristApp.Blazor.Models.Pinpoints
+@using TouristApp.Blazor.Services.Pinpoints
+@using TouristApp.Blazor.Services.Routes
+@using TouristApp.Blazor.Services.TouristRoutes
+@using TouristApp.Blazor.Utils
+@inject IRouteService RouteService
+@inject IPinpointService PinpointService
+@inject ITouristRouteService TouristRouteService
+@inject IJSRuntime JS
+@inject NavigationManager NavManager
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+</head>
+
+@if (_isLoaded)
+{
+    <body class="flex-column">
+    <aside id="map" style="height:500px"></aside>
+    <form>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="routeNameSpan">Название</span>
+            <input class="form-control" id="routeName" placeholder="Название" type="text" @bind-value="@_route.Name" required>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="routeDescriptionSpan">Описание</span>
+            <input class="form-control" id="routeName" placeholder="Описание" type="text" @bind-value="@_route.Description" required>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="routeIdSpan">Маршруты</span>
+            <select class="form-select" id="routeIdSelector" @bind="@_route.Id">
+                <option value="00000000-0000-0000-0000-000000000000" @onclick="RouteSelected">Выберите маршрут</option>
+                @foreach (var route in _routes)
+                {
+                    <option value="@route.Id" @onclick="RouteSelected">@route.Name</option>
+                }
+            </select>
+            <span class="input-group-text">Для редактирования необходимо выбрать маршрут</span>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="firstCoordsSpan">Координаты первой точки*</span>
+            <input class="form-control" id="firstCoords" placeholder="Координаты: X.xxxxxx, Y.yyyyyy" type="text" @bind-value="@_firstPinpointToBuild">
+        </div>
+        @if (_isRouteSelected)
+        {
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="pinpointAddIdSpan">Точки для добавления</span>
+            <select class="form-select" id="pinpointAddIdSelector" @bind="@_pinpointIdForAdd">
+                <option value="00000000-0000-0000-0000-000000000000">Выберите точку</option>
+                @foreach (var pinpoint in _pinpoints)
+                {
+                    <option value="@pinpoint.Id">@pinpoint.Name</option>
+                }
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="pinpointDeleteIdSpan">Точки для удаления</span>
+            <select class="form-select" id="pinpointDeleteIdSelector" @bind="@_pinpointIdForDeletion">
+                <option value="00000000-0000-0000-0000-000000000000">Выберите точку</option>
+                @foreach (var pinpoint in _pinpointsOfSelected)
+                { 
+                    <option value="@pinpoint.Id">@pinpoint.Name</option>
+                }
+            </select>
+        </div>
+        }
+        <div class="input-group mb-3">
+            <div class="btn-group">
+                <button class="btn btn-primary" @onclick="CreateRoute">
+                    Создать
+                </button>
+                @if (_isRouteSelected)
+                {
+                    <button class="btn btn-primary" @onclick="DeleteRoute" formnovalidate>
+                        Удалить
+                    </button>
+
+                    <button class="btn btn-primary" @onclick="UpdateRoute">
+                        Изменить
+                    </button>
+
+                    <button class="btn btn-primary" type="button" @onclick="CheckRoute" formnovalidate>
+                        Просмотреть
+                    </button>
+                }
+            </div>
+        </div>
+        <div class="input-group mb-3">
+            @if (_isRouteSelected)
+            {
+                <div class="btn-group">
+                    <button class="btn btn-primary" @onclick="AddPinpoint" formnovalidate>
+                        Добавить точку
+                    </button>
+
+                    <button class="btn btn-primary" @onclick="RemovePinpoint" formnovalidate>
+                        Удалить точку
+                    </button>
+                </div>
+            }
+        </div>
+    </form>
+    </body>
+}
+
+</html>
+
+@code {
+    private Route _route;
+    private Route _selectedRoute;
+    private Route _buildRoute;
+    private Route[] _routes;
+
+    private Guid _pinpointIdForDeletion;
+    private Guid _pinpointIdForAdd;
+    
+    private Pinpoint _selectedPinpoint;
+    private string _firstPinpointToBuild;
+    private Pinpoint[] _pinpoints;
+    private Pinpoint[] _pinpointsOfSelected;
+
+    private TouristRoute[] _touristRoutes;
+    
+    private bool _isLoaded;
+    private bool _isRouteSelected;
+
+    async protected override Task OnInitializedAsync() {
+        _route = new Route()
+        {
+            Name = string.Empty,
+            Description = string.Empty
+        };
+
+        _selectedRoute = new Route()
+        {
+            Name = string.Empty,
+            Description = string.Empty
+        };
+
+        _selectedPinpoint = new Pinpoint()
+        {
+            Name = string.Empty,
+            Description = string.Empty,
+        };
+
+        _firstPinpointToBuild = string.Empty;
+
+        _buildRoute = new Route();
+
+        _pinpointsOfSelected = Array.Empty<Pinpoint>();
+        _routes = await RouteService.GetAll();
+        _pinpoints = await PinpointService.GetAll();
+        _touristRoutes = await TouristRouteService.GetAll();
+            
+        _isLoaded = true;
+    }
+
+    async protected override Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender)
+        {
+            await Task.Delay(1000);
+            await JS.InvokeVoidAsync("init");
+        }
+    }
+
+    private async Task CreateRoute() {
+        if (_route.Name != string.Empty && _route.Description != string.Empty)
+        {
+            await RouteService.Post(_route);
+
+            _route.Name = string.Empty;
+            _route.Description = string.Empty;
+        }
+    }
+
+    private async Task RouteSelected() {
+        if (_route.Id != Guid.Empty)
+        {
+            _pinpointsOfSelected = _touristRoutes
+                .Where(tr => tr.RouteId == _route.Id)
+                .SelectMany(pc => _pinpoints.Where(p => p.Id == pc.PinpointId))
+                .ToArray();
+
+            if (_firstPinpointToBuild != string.Empty)
+            {
+                await BuildRoute(_route.Id, _firstPinpointToBuild);
+                return;
+            }
+            await BuildRoute(_route.Id);
+            
+            _isRouteSelected = true;
+            
+            return;
+        }
+
+        _isRouteSelected = false;
+    }
+
+    private async Task AddPinpoint() {
+        if (_route.Id != Guid.Empty && _pinpointIdForAdd != Guid.Empty)
+        {
+            await TouristRouteService.Post(new TouristRoute()
+            {
+                PinpointId = _pinpointIdForAdd,
+                RouteId = _route.Id
+            });
+        }
+    }
+
+    private async Task RemovePinpoint() {
+        if (_route.Id != Guid.Empty && _pinpointIdForDeletion != Guid.Empty)
+        {
+            var touristRouteForDeletion = _touristRoutes
+                .FirstOrDefault(tr => tr.RouteId == _route.Id
+                                      && tr.PinpointId == _pinpointIdForDeletion);
+
+            if (touristRouteForDeletion is not null)
+                await TouristRouteService.Delete(touristRouteForDeletion.Id);
+        }
+    }
+    
+    private async Task CheckRoute() {
+        if (_route.Id != Guid.Empty)
+        {
+            var route = await RouteService.Get(_route.Id);
+
+            _route.Name = route.Name;
+            _route.Description = route.Description;
+            
+            return;
+        }
+
+        _route.Name = string.Empty;
+        _route.Description = string.Empty;
+    }
+    
+    private async Task CreateTouristRoute() {
+        if (_selectedRoute.Id != Guid.Empty && _selectedPinpoint.Id != Guid.Empty)
+        {
+            await TouristRouteService.Post(new TouristRoute()
+            {
+                PinpointId = _selectedPinpoint.Id,
+                RouteId = _selectedRoute.Id
+            });
+
+            await BuildRoute(_selectedRoute.Id, _firstPinpointToBuild);
+        }
+    }
+    
+    private async Task BuildRoute(Guid routeId , string? firstPinpoint = null) {
+        var route = await RouteService.Get(routeId);
+
+        var touristRoutes = (await TouristRouteService.GetAll())
+            .Where(tr => tr.RouteId == route.Id);
+
+        if (touristRoutes.Count() < 2)
+        {
+            return;
+        }
+        
+        var pinPoints = new List<JSPinpoint>();
+
+        if (firstPinpoint is not null)
+        {
+            string[] firstPinpointCoords = _firstPinpointToBuild.Trim().Split(','); 
+            var jsPinpoint = new JSPinpoint()
+            {
+                Coords = new[]
+                { 
+                    Convert.ToDecimal(firstPinpointCoords[0].Replace('.', ',')), 
+                    Convert.ToDecimal(firstPinpointCoords[1].Replace('.', ','))
+                },
+                Images = new[] { "" },
+                Info = "Маршрут от первой точки"
+            };
+            pinPoints.Add(jsPinpoint);
+        }
+        
+        foreach (var touristRoute in touristRoutes)
+        {
+            pinPoints.Add(Mapper.MapJsPinpoint((await PinpointService.Get(touristRoute.PinpointId))));
+        }
+
+        pinPoints = pinPoints.ToArray().OrderByCoords().ToList();
+        
+        await JS.InvokeVoidAsync("buildRoute", JsonSerializer.Serialize(pinPoints));
+    }
+    
+    private async Task UpdateRoute() {
+        if (_route.Name != string.Empty &&
+            _route.Description != string.Empty &&
+            _route.Id != Guid.Empty)
+        {
+            await RouteService.Update(_route);
+
+            _route.Name = string.Empty;
+            _route.Description = string.Empty;
+        }
+
+        if (_route.Id != Guid.Empty)
+        {
+            var route = await RouteService.Get(_route.Id);
+
+            _route.Name = route.Name;
+            _route.Description = route.Description;
+        }
+    }
+    
+    private async Task DeleteRoute() {
+        if (_route.Id != Guid.Empty)
+        {
+            await RouteService.Delete(_route.Id);
+            
+            var trsids = _touristRoutes
+                .Where(tr => tr.RouteId == _route.Id)
+                .Select(tr => tr.Id);
+
+            foreach (var id in trsids)
+            {
+                await TouristRouteService.Delete(id);
+            }
+        }
+    }
+}

@@ -1,0 +1,142 @@
+﻿@using TouristApp.Blazor.Services.Categories
+@using TouristApp.Blazor.Services.PinpointCategoryService
+@using TouristApp.Blazor.Models
+@inject ICategoryService CategoryService
+@inject IPinpointCategoryService PinpointCategoryService
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+</head>
+<body class="flex-column">
+@if (_isLoaded)
+{
+    <form>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="categoryNameSpan">Название</span>
+            <input class="form-control" id="categoryName" placeholder="Название" type="text" @bind-value="@_category.Name" required>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="categoryDescriptionSpan">Описание</span>
+            <input class="form-control" id="categoryName" placeholder="Описание" type="text" @bind-value="@_category.Description" required>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="categoryIdSpan">Категории</span>
+            <select class="form-select" id="categoryIdSelector" @bind="@_category.Id">
+                <option value="00000000-0000-0000-0000-000000000000" @onclick="CategorySelected">Выберите категорию</option>
+                @foreach (var category in _categories) 
+                { 
+                    <option value="@category.Id" @onclick="CategorySelected">@category.Name</option>
+                }
+            </select>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-primary" @onclick="CreateCategory">
+                Создать
+            </button>
+            @if (_isCategorySelected)
+            {
+                <button class="btn btn-primary" @onclick="DeleteCategory" formnovalidate>
+                    Удалить
+                </button>
+                <button class="btn btn-primary" @onclick="UpdateCategory">
+                    Изменить
+                </button>
+            }
+            <button class="btn btn-primary" type="button" @onclick="CheckCategory" formnovalidate>
+                Просмотреть
+            </button>
+        </div>
+    </form>
+}
+</body>    
+</html>
+
+@code {
+    private Category _category;
+    private Category[] _categories;
+
+    private PinpointCategory[] _pinpointCategories;
+
+    private bool _isLoaded;
+    private bool _isCategorySelected;
+
+    async protected override Task OnInitializedAsync() {
+        _category = new Category()
+        {
+            Name = string.Empty,
+            Description = string.Empty
+        };
+
+        _categories = await CategoryService.GetAll();
+
+        _pinpointCategories = await PinpointCategoryService.GetAll();
+
+        _isLoaded = true;
+    }
+
+    private async Task CategorySelected() {
+        if (_category.Id != Guid.Empty)
+        {
+            _isCategorySelected = true;
+            return;
+        }
+
+        _isCategorySelected = false;
+    }
+
+    private async Task CreateCategory() {
+        if (_category.Name != string.Empty && _category.Description != string.Empty)
+        {
+            await CategoryService.Post(_category);
+
+            _category.Name = string.Empty;
+            _category.Description = string.Empty;
+        }
+    }
+
+    private async Task UpdateCategory() {
+        if (_category.Name != string.Empty &&
+            _category.Description != string.Empty &&
+            _category.Id != Guid.Empty)
+        {
+            await CategoryService.Update(_category);
+
+            _category.Name = string.Empty;
+            _category.Description = string.Empty;
+        }
+    }
+
+    private async Task CheckCategory() {
+        if (_category.Id != Guid.Empty)
+        {
+            var category = await CategoryService.Get(_category.Id);
+
+            _category.Name = category.Name;
+            _category.Description = category.Description;
+            return;
+        }
+        
+        _category.Name = string.Empty;
+        _category.Description = string.Empty;
+    }
+
+    private async Task DeleteCategory() {
+        if (_category.Id != Guid.Empty)
+        {
+            await CategoryService.Delete(_category.Id);
+
+            var pcids = _pinpointCategories
+                .Where(pc => pc.CategoryId == _category.Id)
+                .Select(pc => pc.Id);
+
+            foreach (var id in pcids)
+            {
+                await PinpointCategoryService.Delete(id);
+            }
+        }
+    }
+}
