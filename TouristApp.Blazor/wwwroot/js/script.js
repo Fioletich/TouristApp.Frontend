@@ -2,6 +2,12 @@
         var locations;
            
              
+function destroyMap() {
+    if (myMap != null) {
+        myMap.destroy();
+        myMap = null;
+    }
+}  
 function buildRoute(pinpointsJson) {
     if (myMap.geoObjects.length != 0) {
         myMap.geoObjects.removeAll();
@@ -71,14 +77,12 @@ function buildRoute(pinpointsJson) {
                   
         
         
-  ymaps.ready(init);
-  
+    ymaps.ready(init);       
       function init() {
-          // Создание карты.
-          myMap = new ymaps.Map("map", {
-              center: [55.751574, 37.573856], // Москва
-              zoom: 10
-          });
+        myMap = new ymaps.Map("map", {
+            center: [55.751574, 37.573856], // Москва
+            zoom: 10
+            });
           /*
           // Пример динамически подгружаемых точек
           locations = [
@@ -165,4 +169,4 @@ function buildRoute(pinpointsJson) {
           }
           */
               
-      }
+      }  

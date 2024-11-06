@@ -7,6 +7,7 @@
 @using TouristApp.Blazor.Services.PinpointCategoryService
 @using TouristApp.Blazor.Services.TouristRoutes
 @using TouristApp.Blazor.Utils
+@implements IDisposable
 @inject IPinpointService PinpointService
 @inject ICategoryService CategoryService
 @inject IPinpointCategoryService PinpointCategoryService
@@ -22,7 +23,7 @@
 <body class="flex-column">
 @if (_isDataLoaded)
 {
-    <aside id="map" style="height:500px"></aside>
+    <aside id="map" style="width: 100%; height:500px; overflow: hidden; position: relative"></aside>
     <form>
         <div class="input-group mb-3">
             <span class="input-group-text" id="pinpointNameSpan">Название</span>
@@ -110,6 +111,8 @@
 </html>
 
 @code {
+    private CancellationTokenSource _cts;
+    
     private StringPinpoint _pinpoint;
     
     private string _coordinates;
@@ -117,6 +120,7 @@
     private Category[] _categoriesOfSelected;
     private Category[] _categories;
     private Category _category;
+    
     private Guid _categoryIdForDeletion;
     private Guid _categoryIdForAdd;
     
@@ -128,6 +132,7 @@
     
     private bool _isPinpointSelected;
     private bool _isDataLoaded;
+    private bool _isDisposed;
 
     async protected override Task OnInitializedAsync() {
         _pinpoint = new StringPinpoint()
@@ -152,10 +157,24 @@
     }
     
     async protected override Task OnAfterRenderAsync(bool firstRender) {
-        if (firstRender)
+        if (firstRender && !_isDisposed)
         {
-            await Task.Delay(1000);
-            await JS.InvokeVoidAsync("init");
+            _cts?.Dispose();
+            _cts = new CancellationTokenSource();
+
+            try
+            {
+                await Task.Delay(1000);
+                await JS.InvokeVoidAsync("init", _cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+
+            }
+            catch (NullReferenceException)
+            {
+                
+            }
         }
     }
 
@@ -301,5 +320,16 @@
                 await PinpointCategoryService.Delete(id);
             }
         }
+    }
+
+    public async void Dispose() {
+        _isDisposed = true;
+        
+        //await JS.InvokeVoidAsync("destroyMap");
+        
+        _cts.Cancel();
+        _cts.Dispose();
+        
+        _cts = null;
     }
 }

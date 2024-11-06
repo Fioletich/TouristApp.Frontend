@@ -7,6 +7,7 @@
 @using TouristApp.Blazor.Services.Routes
 @using TouristApp.Blazor.Services.TouristRoutes
 @using TouristApp.Blazor.Utils
+@implements IDisposable
 @inject ITouristRouteService TouristRouteService
 @inject IRouteService RouteService
 @inject IJSRuntime JS
@@ -16,7 +17,7 @@
 
 @if (_isDataLoaded)
 {
-    <aside id="map" style="height:500px"></aside>
+    <aside id="map" style="width: 100%; height:500px; overflow: hidden; position: relative"></aside>
     <form>
         <div class="input-group mb-3">
             <span class="input-group-text">Маршруты</span>
@@ -46,6 +47,8 @@
 }
 
 @code {
+    private CancellationTokenSource _cts;
+    
     private string _firstPinpointToBuild;
     
     private Route _searchedRoute;
@@ -56,6 +59,7 @@
     private Route[] _suggestedRoutes;
     
     private bool _isDataLoaded;
+    private bool _isDisposed;
 
     async protected override Task OnInitializedAsync() {
         _firstPinpointToBuild = string.Empty;
@@ -82,10 +86,24 @@
     }
 
     async protected override Task OnAfterRenderAsync(bool firstRender) {
-        if (firstRender)
+        if (firstRender && !_isDisposed)
         {
-            await Task.Delay(1000);
-            await JS.InvokeVoidAsync("init");
+            _cts?.Dispose();
+            _cts = new CancellationTokenSource();
+
+            try
+            {
+                await Task.Delay(1000);
+                await JS.InvokeVoidAsync("init", _cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+
+            }
+            catch (NullReferenceException)
+            {
+                
+            }
         }
     }
     
@@ -142,5 +160,16 @@
         pinPoints = pinPoints.ToArray().OrderByCoords().ToList();
         
         await JS.InvokeVoidAsync("buildRoute", JsonSerializer.Serialize(pinPoints));
+    }
+
+    public async void Dispose() {
+        _isDisposed = true;
+        
+        //await JS.InvokeVoidAsync("destroyMap");
+        
+        _cts?.Cancel();
+        _cts?.Dispose();
+        
+        _cts = null;
     }
 }
