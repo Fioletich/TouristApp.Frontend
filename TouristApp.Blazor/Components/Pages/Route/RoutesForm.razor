@@ -20,33 +20,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 </head>
 
-@if (_isLoaded)
+@if (_isDataLoaded)
 {
     <body class="flex-column">
     <aside id="map" style="height:500px"></aside>
     <form>
         <div class="input-group mb-3">
             <span class="input-group-text" id="routeNameSpan">Название</span>
-            <input class="form-control" id="routeName" placeholder="Название" type="text" @bind-value="@_route.Name" required>
+            <input class="form-control" id="routeName" placeholder="Название" type="text" @bind-value="@_route.Name" required autocomplete="off">
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="routeDescriptionSpan">Описание</span>
-            <input class="form-control" id="routeName" placeholder="Описание" type="text" @bind-value="@_route.Description" required>
+            <input class="form-control" id="routeName" placeholder="Описание" type="text" @bind-value="@_route.Description" required autocomplete="off">
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="routeIdSpan">Маршруты</span>
-            <select class="form-select" id="routeIdSelector" @bind="@_route.Id">
-                <option value="00000000-0000-0000-0000-000000000000" @onclick="RouteSelected">Выберите маршрут</option>
+            <select class="form-select" id="routeIdSelector" @onclick="RouteSelected" @bind="@_route.Id">
+                <option value="00000000-0000-0000-0000-000000000000">Выберите маршрут</option>
                 @foreach (var route in _routes)
                 {
-                    <option value="@route.Id" @onclick="RouteSelected">@route.Name</option>
+                    <option value="@route.Id">@route.Name</option>
                 }
             </select>
             <span class="input-group-text">Для редактирования необходимо выбрать маршрут</span>
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="firstCoordsSpan">Координаты первой точки*</span>
-            <input class="form-control" id="firstCoords" placeholder="Координаты: X.xxxxxx, Y.yyyyyy" type="text" @bind-value="@_firstPinpointToBuild">
+            <input class="form-control" id="firstCoords" placeholder="Координаты: X.xxxxxx, Y.yyyyyy" type="text" @bind-value="@_firstPinpointToBuild" autocomplete="off">
         </div>
         @if (_isRouteSelected)
         {
@@ -128,7 +128,7 @@
 
     private TouristRoute[] _touristRoutes;
     
-    private bool _isLoaded;
+    private bool _isDataLoaded;
     private bool _isRouteSelected;
 
     async protected override Task OnInitializedAsync() {
@@ -159,7 +159,7 @@
         _pinpoints = await PinpointService.GetAll();
         _touristRoutes = await TouristRouteService.GetAll();
             
-        _isLoaded = true;
+        _isDataLoaded = true;
     }
 
     async protected override Task OnAfterRenderAsync(bool firstRender) {

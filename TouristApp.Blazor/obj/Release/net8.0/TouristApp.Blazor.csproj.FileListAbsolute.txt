@@ -79,3 +79,4 @@ D:\Works\RiderProjects\TouristApp.Frontendzip\TouristApp.Blazor\obj\Release\net8
 D:\Works\RiderProjects\TouristApp.Frontendzip\TouristApp.Blazor\obj\Release\net8.0\TouristApp.Blazor.pdb
 D:\Works\RiderProjects\TouristApp.Frontendzip\TouristApp.Blazor\obj\Release\net8.0\TouristApp.Blazor.genruntimeconfig.cache
 D:\Works\RiderProjects\TouristApp.Frontendzip\TouristApp.Blazor\obj\Release\net8.0\ref\TouristApp.Blazor.dll
+D:\Works\RiderProjects\TouristApp.Frontendzip\TouristApp.Blazor\obj\Release\net8.0\TouristApp.Blazor.sourcelink.json

@@ -20,29 +20,29 @@
 </head>
 
 <body class="flex-column">
-@if (_isLoaded)
+@if (_isDataLoaded)
 {
     <aside id="map" style="height:500px"></aside>
     <form>
         <div class="input-group mb-3">
             <span class="input-group-text" id="pinpointNameSpan">Название</span>
-            <input class="form-control" id="categoryName" placeholder="Название" type="text" @bind-value="@_pinpoint.Name" required>
+            <input class="form-control" id="categoryName" placeholder="Название" type="text" @bind-value="@_pinpoint.Name" required autocomplete="off">
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="pinpointDescriptionSpan">Описание</span>
-            <input class="form-control" id="categoryName" placeholder="Описание" type="text" @bind-value="@_pinpoint.Description" required>
+            <input class="form-control" id="categoryName" placeholder="Описание" type="text" @bind-value="@_pinpoint.Description" required autocomplete="off">
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="pinpointDescriptionSpan">Координаты</span>
-            <input class="form-control" id="categoryName" placeholder="Координаты: X.xxxxxx, Y.yyyyyy" type="text" @bind-value="@_coordinates" required>
+            <input class="form-control" id="categoryName" placeholder="Координаты: X.xxxxxx, Y.yyyyyy" type="text" @bind-value="@_coordinates" required autocomplete="off">
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="pinpointIdSpan">Достопримечательности</span>
-            <select class="form-select" id="pinpointIdSelector" @bind="@_pinpoint.Id">
-                <option value="00000000-0000-0000-0000-000000000000" @onclick="PinpointSelected">Выберите точку</option>
+            <select class="form-select" id="pinpointIdSelector" @bind="@_pinpoint.Id" @onclick="PinpointSelected">
+                <option value="00000000-0000-0000-0000-000000000000">Выберите точку</option>
                 @foreach (var pinpoint in _pinpoints)
                 {
-                    <option value="@pinpoint.Id" @onclick="PinpointSelected">@pinpoint.Name</option>
+                    <option value="@pinpoint.Id">@pinpoint.Name</option>
                 }
             </select>
             <span class="input-group-text">Для редактирования необходимо выбрать достопримечательность</span>
@@ -127,7 +127,7 @@
     private PinpointCategory[] _pinpointCategories;
     
     private bool _isPinpointSelected;
-    private bool _isLoaded;
+    private bool _isDataLoaded;
 
     async protected override Task OnInitializedAsync() {
         _pinpoint = new StringPinpoint()
@@ -148,7 +148,7 @@
         _touristRoutes = await TouristRouteService.GetAll();
         _pinpointCategories = await PinpointCategoryService.GetAll();
             
-        _isLoaded = true;
+        _isDataLoaded = true;
     }
     
     async protected override Task OnAfterRenderAsync(bool firstRender) {

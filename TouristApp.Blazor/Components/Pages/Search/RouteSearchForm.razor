@@ -1,0 +1,146 @@
+﻿@using System.Text.Json
+@using TouristApp.Blazor.Models
+@using TouristApp.Blazor.Models.Pinpoints
+@using TouristApp.Blazor.Services.Categories
+@using TouristApp.Blazor.Services.PinpointCategoryService
+@using TouristApp.Blazor.Services.Pinpoints
+@using TouristApp.Blazor.Services.Routes
+@using TouristApp.Blazor.Services.TouristRoutes
+@using TouristApp.Blazor.Utils
+@inject ITouristRouteService TouristRouteService
+@inject IRouteService RouteService
+@inject IJSRuntime JS
+@inject ICategoryService CategoryService
+@inject IPinpointCategoryService PinpointCategoryService
+@inject IPinpointService PinpointService
+
+@if (_isDataLoaded)
+{
+    <aside id="map" style="height:500px"></aside>
+    <form>
+        <div class="input-group mb-3">
+            <span class="input-group-text">Маршруты</span>
+            <input list="suggested-routes" class="form-control" placeholder="Введите название маршрута..." type="search" spellcheck="true" @bind="_searchedRoute.Name">
+            <small class="form-text text-muted">Для корректного поиска необходимо испольовать автозаполнение</small>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="firstCoordsSpan">Координаты первой точки*</span>
+            <input class="form-control" id="firstCoords" placeholder="Координаты: X.xxxxxx, Y.yyyyyy" type="text" @bind-value="@_firstPinpointToBuild" autocomplete="off">
+        </div>
+        
+        <div class="input-group mb-3">
+            <div class="btn-group">
+                <button class="btn btn-primary" type="button" @onclick="BuildRouteHandler">
+                    Построить
+                </button>
+            </div>
+        </div>
+        
+        <datalist id="suggested-routes">
+            @for (int i = 0; i < _suggestedRoutes.Length && i != 5; i++)
+            {
+                <option value="@_suggestedRoutes[i].Name"></option>
+            }
+        </datalist>
+    </form>
+}
+
+@code {
+    private string _firstPinpointToBuild;
+    
+    private Route _searchedRoute;
+
+    private Category[] _categories;
+    private Category _searchedCategory;
+
+    private Route[] _suggestedRoutes;
+    
+    private bool _isDataLoaded;
+
+    async protected override Task OnInitializedAsync() {
+        _firstPinpointToBuild = string.Empty;
+        
+        _searchedRoute = new Route()
+        {
+            Id = Guid.Empty,
+            Name = string.Empty,
+            Description = string.Empty
+        };
+
+        _categories = await CategoryService.GetAll();
+
+        _searchedCategory = new Category()
+        {
+            Id = Guid.Empty,
+            Name = string.Empty,
+            Description = string.Empty
+        };
+
+        _suggestedRoutes = await RouteService.GetAll();
+
+        _isDataLoaded = true;
+    }
+
+    async protected override Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender)
+        {
+            await Task.Delay(1000);
+            await JS.InvokeVoidAsync("init");
+        }
+    }
+    
+    private async Task BuildRouteHandler() {
+        var route = _suggestedRoutes
+            .FirstOrDefault(r => r.Name == _searchedRoute.Name);
+
+        if (route is not null)
+        {
+            if (_firstPinpointToBuild != string.Empty)
+            {
+                await BuildRoute(route.Id, _firstPinpointToBuild);
+                return;
+            }
+
+            await BuildRoute(route.Id);
+        }
+    }
+    
+    private async Task BuildRoute(Guid routeId , string? firstPinpoint = null) {
+        var route = await RouteService.Get(routeId);
+
+        var touristRoutes = (await TouristRouteService.GetAll())
+            .Where(tr => tr.RouteId == route.Id);
+
+        if (touristRoutes.Count() < 2)
+        {
+            return;
+        }
+        
+        var pinPoints = new List<JSPinpoint>();
+
+        if (firstPinpoint is not null)
+        {
+            string[] firstPinpointCoords = _firstPinpointToBuild.Trim().Split(','); 
+            var jsPinpoint = new JSPinpoint()
+            {
+                Coords = new[]
+                { 
+                    Convert.ToDecimal(firstPinpointCoords[0].Replace('.', ',')), 
+                    Convert.ToDecimal(firstPinpointCoords[1].Replace('.', ','))
+                },
+                Images = new[] { "" },
+                Info = "Маршрут от первой точки"
+            };
+            pinPoints.Add(jsPinpoint);
+        }
+        
+        foreach (var touristRoute in touristRoutes)
+        {
+            pinPoints.Add(Mapper.MapJsPinpoint((await PinpointService.Get(touristRoute.PinpointId))));
+        }
+
+        pinPoints = pinPoints.ToArray().OrderByCoords().ToList();
+        
+        await JS.InvokeVoidAsync("buildRoute", JsonSerializer.Serialize(pinPoints));
+    }
+}

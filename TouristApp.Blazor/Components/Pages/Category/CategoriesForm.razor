@@ -17,19 +17,19 @@
     <form>
         <div class="input-group mb-3">
             <span class="input-group-text" id="categoryNameSpan">Название</span>
-            <input class="form-control" id="categoryName" placeholder="Название" type="text" @bind-value="@_category.Name" required>
+            <input class="form-control" id="categoryName" placeholder="Название" type="text" @bind-value="@_category.Name" required autocomplete="off">
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="categoryDescriptionSpan">Описание</span>
-            <input class="form-control" id="categoryName" placeholder="Описание" type="text" @bind-value="@_category.Description" required>
+            <input class="form-control" id="categoryName" placeholder="Описание" type="text" @bind-value="@_category.Description" required autocomplete="off">
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="categoryIdSpan">Категории</span>
-            <select class="form-select" id="categoryIdSelector" @bind="@_category.Id">
-                <option value="00000000-0000-0000-0000-000000000000" @onclick="CategorySelected">Выберите категорию</option>
+            <select class="form-select" id="categoryIdSelector" @onclick="CategorySelected" @bind="@_category.Id" >
+                <option value="00000000-0000-0000-0000-000000000000" >Выберите категорию</option>
                 @foreach (var category in _categories) 
                 { 
-                    <option value="@category.Id" @onclick="CategorySelected">@category.Name</option>
+                    <option value="@category.Id">@category.Name</option>
                 }
             </select>
         </div>
@@ -82,6 +82,7 @@
         if (_category.Id != Guid.Empty)
         {
             _isCategorySelected = true;
+            
             return;
         }
 
