@@ -17,4 +17,11 @@
       <PackageReference Include="Syncfusion.Blazor.Core" Version="27.1.53" />
       <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="27.1.53" />
     </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Components\Pages\Editing\EditingForm.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Editing\EditingPage.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Deleting\DeletingForm.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Deleting\DeletingPage.razor" />
+    </ItemGroup>
 </Project>
