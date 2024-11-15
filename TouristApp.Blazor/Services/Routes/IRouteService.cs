@@ -1,6 +1,4 @@
-﻿using TouristApp.Blazor.Models;
-
-namespace TouristApp.Blazor.Services.Routes;
+﻿namespace TouristApp.Blazor.Services.Routes;
 
 public interface IRouteService {
     public Task<Models.Route[]> GetAll();

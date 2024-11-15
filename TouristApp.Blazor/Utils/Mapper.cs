@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Globalization;
+using Microsoft.AspNetCore.Components;
 using TouristApp.Blazor.Models.Pinpoints;
 
 namespace TouristApp.Blazor.Utils;
@@ -7,7 +8,7 @@ public static class Mapper {
     public static JSPinpoint MapJsPinpoint(Pinpoint pinpoint) {
         var jsPinpoint = new JSPinpoint()
         {
-            Coords = new[] { Convert.ToDecimal(pinpoint.XCoordinate), Convert.ToDecimal(pinpoint.YCoordinate) },
+            Coords = new[] { Convert.ToDecimal(pinpoint.XCoordinate, CultureInfo.InvariantCulture), Convert.ToDecimal(pinpoint.YCoordinate, CultureInfo.InvariantCulture) },
             Info = $"{pinpoint.Name}: {pinpoint.Description}",
             Images = new[] { "" }
         };
@@ -22,8 +23,8 @@ public static class Mapper {
 
         if (parts.Length > 1)
         {
-            result += Convert.ToDecimal(parts[0]);
-            result += (Convert.ToDecimal(parts[1]) / (decimal)Math.Pow(10, parts[1].Length));
+            result += Convert.ToDecimal(parts[0], CultureInfo.InvariantCulture);
+            result += (Convert.ToDecimal(parts[1], CultureInfo.InvariantCulture) / (decimal)Math.Pow(10, parts[1].Length));
         }
         
         return result;
@@ -61,7 +62,7 @@ public static class Mapper {
 
             if (notOrdered.Count == 0)
                 continue;
-            
+
             ordered.Add(notOrdered[closestPointIndex]);
             notOrdered.RemoveAt(closestPointIndex);
             minDistance = decimal.MaxValue;
@@ -69,12 +70,7 @@ public static class Mapper {
 
         return ordered.ToArray();
     }
-    /*
-     var squaredDelta = ((ordered[i].Coords[0] - notOrdered[j].Coords[0]) *
-                                   (ordered[i].Coords[0] - notOrdered[j].Coords[0])) +
-                                   ((ordered[i].Coords[1] - notOrdered[j].Coords[1]) *
-                                   (ordered[i].Coords[1] - notOrdered[j].Coords[1]));
-     */
+
     private static decimal SquareDistance(JSPinpoint point1, JSPinpoint point2) {
         return ((point1.Coords[0] - point2.Coords[0]) * (point1.Coords[0] - point2.Coords[0])) +
                ((point1.Coords[1] - point2.Coords[1]) * (point1.Coords[1] - point2.Coords[1]));

@@ -1,5 +1,4 @@
-﻿using TouristApp.Blazor.Models;
-using TouristApp.Blazor.Models.Pinpoints;
+﻿using TouristApp.Blazor.Models.Pinpoints;
 
 namespace TouristApp.Blazor.Services.Pinpoints;
 

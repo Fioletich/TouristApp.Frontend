@@ -1,4 +1,5 @@
-﻿@using System.Text.Json
+﻿@using System.Globalization
+@using System.Text.Json
 @using TouristApp.Blazor.Models
 @using TouristApp.Blazor.Models.Pinpoints
 @using TouristApp.Blazor.Services.Pinpoints
@@ -293,8 +294,8 @@
             {
                 Coords = new[]
                 { 
-                    Convert.ToDecimal(firstPinpointCoords[0].Replace('.', ',')), 
-                    Convert.ToDecimal(firstPinpointCoords[1].Replace('.', ','))
+                    Convert.ToDecimal(firstPinpointCoords[0], CultureInfo.InvariantCulture), 
+                    Convert.ToDecimal(firstPinpointCoords[1], CultureInfo.InvariantCulture)
                 },
                 Images = new[] { "" },
                 Info = "Маршрут от первой точки"
