@@ -1,6 +1,7 @@
 ﻿var myMap;
 var locations;
-var multiRoute;      
+var multiRoute;     
+var points; 
              
 function destroyMap() {
     if (myMap != null) {
@@ -12,10 +13,11 @@ function destroyMap() {
 function buildSearchMapRoute(pinpointsJson) {
     if (multiRoute) {
         myMap.geoObjects.remove(multiRoute);   
+        points.forEach(point => myMap.geoObjects.remove(point))
     }
 
     const pinpoints = JSON.parse(pinpointsJson)
-    const points = pinpoints.map(pinpoint => {
+    points = pinpoints.map(pinpoint => {
         return new ymaps.Placemark(pinpoint.coords, {
             balloonContent: createBalloonContent(pinpoint.info, pinpoint.images)
             }, {
