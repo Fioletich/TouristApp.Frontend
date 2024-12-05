@@ -25,7 +25,7 @@
 @if (_isDataLoaded)
 {
     <body class="flex-column">
-    <aside id="map" style="width: 100%; height:500px; overflow: hidden; position: relative"></aside>
+    <aside id="routeMap" style="width: 100%; height:500px; overflow: hidden; position: relative"></aside>
     <form>
         <div class="input-group mb-3">
             <span class="input-group-text" id="routeNameSpan">Название</span>
@@ -124,6 +124,7 @@
 
     private Guid _pinpointIdForDeletion;
     private Guid _pinpointIdForAdd;
+    private Guid _pinpointIdForAudio;
     
     private Pinpoint _selectedPinpoint;
     private string _firstPinpointToBuild;
@@ -135,6 +136,7 @@
     private bool _isDataLoaded;
     private bool _isRouteSelected;
     private bool _isDisposed;
+    private bool _isAudioSelected;
 
     async protected override Task OnInitializedAsync() {
         _route = new Route()
@@ -176,7 +178,7 @@
             try
             {
                 await Task.Delay(1000);
-                await JS.InvokeVoidAsync("init", _cts.Token);
+                await JS.InvokeVoidAsync("initRouteMap", _cts.Token);
             }
             catch (OperationCanceledException)
             {
@@ -184,9 +186,12 @@
             }
             catch (ObjectDisposedException)
             {
+
+            }
+            catch (NullReferenceException)
+            {
                 
             }
-            
         }
     }
 
@@ -305,12 +310,21 @@
         
         foreach (var touristRoute in touristRoutes)
         {
-            pinPoints.Add(Mapper.MapJsPinpoint((await PinpointService.Get(touristRoute.PinpointId))));
+            var pinpoint = await PinpointService.Get(touristRoute.PinpointId);
+            var jsPinpoint = Mapper.MapJsPinpoint(pinpoint);
+
+            if (!string.IsNullOrEmpty(pinpoint.AudioUrl))
+            {
+                jsPinpoint.Info += "\n\n<audio controls=\"controls\">\n       " +
+                                   $"     <source src=\"{pinpoint.AudioUrl}\" type=\"audio/mp3\">\n        </audio>";
+            }
+            
+            pinPoints.Add(jsPinpoint);
         }
 
         pinPoints = pinPoints.ToArray().OrderByCoords().ToList();
         
-        await JS.InvokeVoidAsync("buildRoute", JsonSerializer.Serialize(pinPoints));
+        await JS.InvokeVoidAsync("buildRouteMapRoute", JsonSerializer.Serialize(pinPoints));
     }
     
     private async Task UpdateRoute() {
@@ -349,10 +363,20 @@
         }
     }
 
+    public async Task AudioSelected() {
+        if (_pinpointIdForAudio == Guid.Empty)
+        {
+            _isAudioSelected = false;
+            return;
+        }
+
+        _isAudioSelected = true;
+    }
+
     public async void Dispose() {
         _isDisposed = true;
         
-        //await JS.InvokeVoidAsync("destroyMap");
+        await JS.InvokeVoidAsync("destroyMap");
         
         _cts?.Cancel();
         _cts?.Dispose();

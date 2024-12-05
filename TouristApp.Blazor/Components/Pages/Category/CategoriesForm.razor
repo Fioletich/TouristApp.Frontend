@@ -1,6 +1,7 @@
 ﻿@using TouristApp.Blazor.Services.Categories
 @using TouristApp.Blazor.Services.PinpointCategoryService
 @using TouristApp.Blazor.Models
+@using TouristApp.Blazor.Services.GeoLocationBroker
 @inject ICategoryService CategoryService
 @inject IPinpointCategoryService PinpointCategoryService
 
@@ -63,6 +64,8 @@
 
     private bool _isLoaded;
     private bool _isCategorySelected;
+
+    private Coordinate _coordinate;
 
     async protected override Task OnInitializedAsync() {
         _category = new Category()

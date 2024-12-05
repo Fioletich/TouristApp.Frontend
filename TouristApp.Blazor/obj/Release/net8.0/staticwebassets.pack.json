@@ -21,8 +21,28 @@
       "PackagePath": "staticwebassets\\favicon.png"
     },
     {
+      "Id": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\wwwroot\\js\\geoLocationJsInterop.js",
+      "PackagePath": "staticwebassets\\js\\geoLocationJsInterop.js"
+    },
+    {
+      "Id": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\wwwroot\\js\\navigatorMapScript.js",
+      "PackagePath": "staticwebassets\\js\\navigatorMapScript.js"
+    },
+    {
+      "Id": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\wwwroot\\js\\pinpointMapScript.js",
+      "PackagePath": "staticwebassets\\js\\pinpointMapScript.js"
+    },
+    {
+      "Id": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\wwwroot\\js\\routeMapScript.js",
+      "PackagePath": "staticwebassets\\js\\routeMapScript.js"
+    },
+    {
       "Id": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\wwwroot\\js\\script.js",
       "PackagePath": "staticwebassets\\js\\script.js"
+    },
+    {
+      "Id": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\wwwroot\\js\\searchMapScript.js",
+      "PackagePath": "staticwebassets\\js\\searchMapScript.js"
     },
     {
       "Id": "obj\\Release\\net8.0\\staticwebassets\\msbuild.TouristApp.Blazor.Microsoft.AspNetCore.StaticWebAssets.props",
