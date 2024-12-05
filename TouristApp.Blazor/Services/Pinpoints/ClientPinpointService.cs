@@ -1,6 +1,4 @@
-﻿using TouristApp.Blazor.Models;
-using TouristApp.Blazor.Models.Pinpoints;
-using TouristApp.Blazor.Utils;
+﻿using TouristApp.Blazor.Models.Pinpoints;
 
 namespace TouristApp.Blazor.Services.Pinpoints;
 
@@ -20,6 +18,7 @@ public class ClientPinpointService(HttpClient httpClient) : IPinpointService {
             .PostAsync($"Pinpoint/Post?" + 
                        $"&Name={pinpoint.Name}" +
                        $"&Description={pinpoint.Description}" +
+                       $"&AudioUrl={pinpoint.AudioUrl}" +
                        $"&XCoordinate={pinpoint.XCoordinate}" + 
                        $"&YCoordinate={pinpoint.YCoordinate}"
                 , null
@@ -36,6 +35,7 @@ public class ClientPinpointService(HttpClient httpClient) : IPinpointService {
                       $"Id={pinpoint.Id}" +
                       $"&Name={pinpoint.Name}" +
                       $"&Description={pinpoint.Description}" +
+                      $"&AudioUrl={pinpoint.AudioUrl}" +
                       $"&XCoordinate={pinpoint.XCoordinate}" +
                       $"&YCoordinate={pinpoint.YCoordinate}"
                 , null

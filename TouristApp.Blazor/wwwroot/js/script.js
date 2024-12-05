@@ -1,5 +1,5 @@
-﻿        var myMap;
-        var locations;
+﻿var myMap;
+var locations;
            
              
 function destroyMap() {
@@ -43,7 +43,7 @@ function buildRoute(pinpointsJson) {
                   var multiRoute = new ymaps.multiRouter.MultiRoute({
                           referencePoints: coords, 
                           params: {
-                              routingMode: 'auto' 
+                              routingMode: 'pedestrian'
                           }
                       }, {
                           boundsAutoApply: true
@@ -80,7 +80,7 @@ function buildRoute(pinpointsJson) {
     ymaps.ready(init);       
       function init() {
         myMap = new ymaps.Map("map", {
-            center: [55.751574, 37.573856], // Москва
+            center: [51.660575, 39.199930], // Воронеж
             zoom: 10
             });
           /*

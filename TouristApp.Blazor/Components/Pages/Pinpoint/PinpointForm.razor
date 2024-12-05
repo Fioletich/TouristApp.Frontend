@@ -3,6 +3,7 @@
 @using TouristApp.Blazor.Models
 @using TouristApp.Blazor.Models.Pinpoints
 @using TouristApp.Blazor.Services.Categories
+@using TouristApp.Blazor.Services.GeoLocationBroker
 @using TouristApp.Blazor.Services.Pinpoints
 @using TouristApp.Blazor.Services.PinpointCategoryService
 @using TouristApp.Blazor.Services.TouristRoutes
@@ -23,7 +24,7 @@
 <body class="flex-column">
 @if (_isDataLoaded)
 {
-    <aside id="map" style="width: 100%; height:500px; overflow: hidden; position: relative"></aside>
+    <aside id="pinpointMap" style="width: 100%; height:500px; overflow: hidden; position: relative"></aside>
     <form>
         <div class="input-group mb-3">
             <span class="input-group-text" id="pinpointNameSpan">Название</span>
@@ -32,6 +33,10 @@
         <div class="input-group mb-3">
             <span class="input-group-text" id="pinpointDescriptionSpan">Описание</span>
             <input class="form-control" id="categoryName" placeholder="Описание" type="text" @bind-value="@_pinpoint.Description" required autocomplete="off">
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="pinpointAudioSpan">Ссылка на аудио*</span>
+            <input class="form-control" id="categoryName" placeholder="Ссылка" type="text" @bind-value="@_pinpoint.AudioUrl" autocomplete="off">
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="pinpointDescriptionSpan">Координаты</span>
@@ -77,11 +82,11 @@
                     Создать
                 </button>
                 @if (_isPinpointSelected)
-                { 
+                {
                     <button class="btn btn-primary" @onclick="DeletePinpoint" formnovalidate>
                         Удалить
                     </button>
-            
+
                     <button class="btn btn-primary" @onclick="UpdatePinpoint">
                         Изменить
                     </button>
@@ -92,44 +97,45 @@
             </div>
         </div>
         <div class="input-group mb-3">
-        @if (_isPinpointSelected)
-        {
-            <div class="btn-group">
-                <button class="btn btn-primary" @onclick="AddCategory" formnovalidate>
-                    Добавить категорию
-                </button>
+            @if (_isPinpointSelected)
+            {
+                <div class="btn-group">
+                    <button class="btn btn-primary" @onclick="AddCategory" formnovalidate>
+                        Добавить категорию
+                    </button>
 
-                <button class="btn btn-primary" @onclick="RemoveCategory" formnovalidate>
-                    Удалить категорию
-                </button>
-            </div>
-        }
+                    <button class="btn btn-primary" @onclick="RemoveCategory" formnovalidate>
+                        Удалить категорию
+                    </button>
+                </div>
+            }
         </div>
     </form>
 }
+
 </body>
 </html>
 
 @code {
-    private CancellationTokenSource _cts;
-    
-    private StringPinpoint _pinpoint;
-    
-    private string _coordinates;
-    
-    private Category[] _categoriesOfSelected;
-    private Category[] _categories;
-    private Category _category;
-    
+    private CancellationTokenSource? _cts;
+
+    private StringPinpoint? _pinpoint;
+
+    private string? _coordinates;
+
+    private Category[]? _categoriesOfSelected;
+    private Category[]? _categories;
+    private Category? _category;
+
     private Guid _categoryIdForDeletion;
     private Guid _categoryIdForAdd;
-    
-    private Pinpoint[] _pinpoints;
-    
-    private TouristRoute[] _touristRoutes;
-    
-    private PinpointCategory[] _pinpointCategories;
-    
+
+    private Pinpoint[]? _pinpoints;
+
+    private TouristRoute[]? _touristRoutes;
+
+    private PinpointCategory[]? _pinpointCategories;
+
     private bool _isPinpointSelected;
     private bool _isDataLoaded;
     private bool _isDisposed;
@@ -142,7 +148,7 @@
             XCoordinate = string.Empty,
             YCoordinate = string.Empty
         };
-        
+
         _category = new Category();
 
         _coordinates = string.Empty;
@@ -152,10 +158,10 @@
         _pinpoints = await PinpointService.GetAll();
         _touristRoutes = await TouristRouteService.GetAll();
         _pinpointCategories = await PinpointCategoryService.GetAll();
-            
+
         _isDataLoaded = true;
     }
-    
+
     async protected override Task OnAfterRenderAsync(bool firstRender) {
         if (firstRender && !_isDisposed)
         {
@@ -165,7 +171,7 @@
             try
             {
                 await Task.Delay(1000);
-                await JS.InvokeVoidAsync("init", _cts.Token);
+                await JS.InvokeVoidAsync("initPinpointMap", _cts.Token);
             }
             catch (OperationCanceledException)
             {
@@ -173,21 +179,25 @@
             }
             catch (NullReferenceException)
             {
-                
+
+            }
+            catch (JSDisconnectedException ex)
+            {
+
             }
         }
     }
 
     private async Task PinpointSelected() {
-        if (_pinpoint.Id != Guid.Empty)
+        if (_pinpoint?.Id != Guid.Empty)
         {
             _categoriesOfSelected = _pinpointCategories
-                .Where(pc => pc.PinpointId == _pinpoint.Id)
+                ?.Where(pc => pc.PinpointId == _pinpoint?.Id)
                 .SelectMany(pc => _categories.Where(p => p.Id == pc.CategoryId))
                 .ToArray();
 
             var idPinpoint = await PinpointService.Get(_pinpoint.Id);
-            
+
             var pinpoint = new Pinpoint()
             {
                 Name = idPinpoint.Name,
@@ -196,11 +206,12 @@
                 YCoordinate = idPinpoint.YCoordinate
             };
 
-            await JS.InvokeVoidAsync("buildRoute",
+            await JS.InvokeVoidAsync("buildPinpointMapRoute",
                 JsonSerializer
                     .Serialize(new[] { Mapper.MapJsPinpoint(pinpoint) }));
-            
+
             _isPinpointSelected = true;
+
             return;
         }
 
@@ -208,24 +219,16 @@
     }
 
     private async Task SavePinpoint() {
-        if (_pinpoint.Name != string.Empty && 
-            _pinpoint.Description != string.Empty && 
+        if (_pinpoint?.Name != string.Empty &&
+            _pinpoint?.Description != string.Empty &&
             _coordinates != string.Empty)
         {
             string[] coordinates = _coordinates.Trim().Split(',');
             _pinpoint.XCoordinate = coordinates[0];
             _pinpoint.YCoordinate = coordinates[1];
-            
+
             _pinpoint.Id = await PinpointService.Post(_pinpoint);
 
-            var pinpoint = new Pinpoint()
-            {
-                Name = _pinpoint.Name,
-                Description = _pinpoint.Description,
-                XCoordinate = Mapper.ConvertStringToDecimal(_pinpoint.XCoordinate),
-                YCoordinate = Mapper.ConvertStringToDecimal(_pinpoint.YCoordinate)
-            };
-            
             _pinpoint.Name = string.Empty;
             _pinpoint.Description = string.Empty;
             _pinpoint.XCoordinate = string.Empty;
@@ -248,10 +251,10 @@
         if (_categoryIdForDeletion != Guid.Empty && _pinpoint.Id != Guid.Empty)
         {
             var pinpointCategory = _pinpointCategories
-                .FirstOrDefault(pc => pc.PinpointId == _pinpoint.Id 
+                .FirstOrDefault(pc => pc.PinpointId == _pinpoint.Id
                                       && pc.CategoryId == _categoryIdForDeletion);
 
-            if (pinpointCategory is not null) 
+            if (pinpointCategory is not null)
                 await PinpointCategoryService.Delete(pinpointCategory.Id);
         }
     }
@@ -265,7 +268,7 @@
             string[] coordinates = _coordinates.Trim().Split(',');
             _pinpoint.XCoordinate = coordinates[0];
             _pinpoint.YCoordinate = coordinates[1];
-            
+
             await PinpointService.Update(_pinpoint);
 
             _pinpoint.Name = string.Empty;
@@ -281,22 +284,24 @@
 
             _pinpoint.Name = pinpoint.Name;
             _pinpoint.Description = pinpoint.Description;
+            _pinpoint.AudioUrl = pinpoint.AudioUrl;
 
             string xCoordinate = pinpoint.XCoordinate
                 .ToString(CultureInfo.InvariantCulture).Replace(',', '.');
+
             string yCoordinate = pinpoint.YCoordinate
                 .ToString(CultureInfo.InvariantCulture).Replace(',', '.');
 
             _coordinates = $"{xCoordinate}, {yCoordinate}";
-            
+
             return;
         }
-        
+
         _pinpoint.Name = string.Empty;
         _pinpoint.Description = string.Empty;
         _coordinates = string.Empty;
     }
-    
+
     private async Task DeletePinpoint() {
         if (_pinpoint.Id != Guid.Empty)
         {
@@ -324,12 +329,12 @@
 
     public async void Dispose() {
         _isDisposed = true;
-        
+
         //await JS.InvokeVoidAsync("destroyMap");
-        
-        _cts.Cancel();
-        _cts.Dispose();
-        
+
+        _cts?.Cancel();
+        _cts?.Dispose();
+
         _cts = null;
     }
 }

@@ -2,6 +2,7 @@ using Syncfusion.Blazor;
 using TouristApp.Blazor.Components;
 using TouristApp.Blazor.Services.Categories;
 using TouristApp.Blazor.Services.Featureds;
+using TouristApp.Blazor.Services.GeoLocationBroker;
 using TouristApp.Blazor.Services.PinpointCategoryService;
 using TouristApp.Blazor.Services.Pinpoints;
 using TouristApp.Blazor.Services.Routes;
@@ -22,7 +23,15 @@ builder.Services.AddSingleton<IRouteService, ClientRouteService>();
 builder.Services.AddSingleton<ITouristRouteService, ClientTouristRouteService>();
 builder.Services.AddSingleton<IUserService, ClientUserService>();
 builder.Services.AddSingleton<IPinpointCategoryService, ClientPinpointCategoryService>();
+builder.Services.AddScoped<IGeoLocationBroker, GeoLocationBroker>();
 builder.Services.AddSyncfusionBlazor();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+        builder.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
 
 var app = builder.Build();
 
@@ -34,9 +43,13 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseRouting();
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
+app.UseCors("AllowAll");
+
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
