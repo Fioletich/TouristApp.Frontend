@@ -98,6 +98,11 @@
     async protected override Task OnAfterRenderAsync(bool firstRender) {
         if (firstRender && !_isDisposed)
         {
+            GeoLocationBroker.OnGeolocationPositionError += async error =>
+            {
+                await JS.InvokeVoidAsync("console.error", $"Error code: {error.ErrorCode}; Error message: {error.ErrorMessage}");
+            };
+            
             _cts?.Dispose();
             _cts = new CancellationTokenSource();
 
@@ -171,7 +176,7 @@
             var firstPinpointGeo = new JSPinpoint()
             {
                 Images = new[] { "" },
-                Info = "Маршрут от первой точки"
+                Info = "Маршрут от точки, определенной геолокацией"
             };
             firstPinpointGeo.Coords = new decimal[2];
             
@@ -201,7 +206,7 @@
                 await JS.InvokeVoidAsync("buildSearchMapRoute", JsonSerializer.Serialize(pinPoints));
             };
             
-            await GeoLocationBroker.RequestGeoLocationAsync();
+            await GeoLocationBroker.RequestGeoLocationAsync(true, 60000);
             return;
         }
         
