@@ -1164,19 +1164,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\User\\.nuget\\packages\\": {}
+    "C:\\Users\\kharikrishna\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\TouristApp.Blazor.csproj",
+      "projectUniqueName": "C:\\Users\\kharikrishna\\RiderProjects\\TouristApp.Frontend\\TouristApp.Blazor\\TouristApp.Blazor.csproj",
       "projectName": "TouristApp.Blazor",
-      "projectPath": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\TouristApp.Blazor.csproj",
-      "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\obj\\",
+      "projectPath": "C:\\Users\\kharikrishna\\RiderProjects\\TouristApp.Frontend\\TouristApp.Blazor\\TouristApp.Blazor.csproj",
+      "packagesPath": "C:\\Users\\kharikrishna\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\kharikrishna\\RiderProjects\\TouristApp.Frontend\\TouristApp.Blazor\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\kharikrishna\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -1233,7 +1233,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Users\\User\\.dotnet\\sdk\\8.0.300/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Users\\kharikrishna\\.dotnet\\sdk\\8.0.404/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

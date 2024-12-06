@@ -1,47 +1,43 @@
 {
   "Files": [
     {
-      "Id": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\TouristApp.Blazor.bundle.scp.css",
+      "Id": "C:\\Users\\kharikrishna\\RiderProjects\\TouristApp.Frontend\\TouristApp.Blazor\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\TouristApp.Blazor.bundle.scp.css",
       "PackagePath": "staticwebassets\\TouristApp.Blazor.bundle.scp.css"
     },
     {
-      "Id": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\wwwroot\\app.css",
+      "Id": "C:\\Users\\kharikrishna\\RiderProjects\\TouristApp.Frontend\\TouristApp.Blazor\\wwwroot\\app.css",
       "PackagePath": "staticwebassets\\app.css"
     },
     {
-      "Id": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "Id": "C:\\Users\\kharikrishna\\RiderProjects\\TouristApp.Frontend\\TouristApp.Blazor\\wwwroot\\bootstrap\\bootstrap.min.css",
       "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css"
     },
     {
-      "Id": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "Id": "C:\\Users\\kharikrishna\\RiderProjects\\TouristApp.Frontend\\TouristApp.Blazor\\wwwroot\\bootstrap\\bootstrap.min.css.map",
       "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css.map"
     },
     {
-      "Id": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\wwwroot\\favicon.png",
+      "Id": "C:\\Users\\kharikrishna\\RiderProjects\\TouristApp.Frontend\\TouristApp.Blazor\\wwwroot\\favicon.png",
       "PackagePath": "staticwebassets\\favicon.png"
     },
     {
-      "Id": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\wwwroot\\js\\geoLocationJsInterop.js",
+      "Id": "C:\\Users\\kharikrishna\\RiderProjects\\TouristApp.Frontend\\TouristApp.Blazor\\wwwroot\\js\\geoLocationJsInterop.js",
       "PackagePath": "staticwebassets\\js\\geoLocationJsInterop.js"
     },
     {
-      "Id": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\wwwroot\\js\\navigatorMapScript.js",
-      "PackagePath": "staticwebassets\\js\\navigatorMapScript.js"
-    },
-    {
-      "Id": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\wwwroot\\js\\pinpointMapScript.js",
+      "Id": "C:\\Users\\kharikrishna\\RiderProjects\\TouristApp.Frontend\\TouristApp.Blazor\\wwwroot\\js\\pinpointMapScript.js",
       "PackagePath": "staticwebassets\\js\\pinpointMapScript.js"
     },
     {
-      "Id": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\wwwroot\\js\\routeMapScript.js",
+      "Id": "C:\\Users\\kharikrishna\\RiderProjects\\TouristApp.Frontend\\TouristApp.Blazor\\wwwroot\\js\\routeMapScript.js",
       "PackagePath": "staticwebassets\\js\\routeMapScript.js"
     },
     {
-      "Id": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\wwwroot\\js\\script.js",
+      "Id": "C:\\Users\\kharikrishna\\RiderProjects\\TouristApp.Frontend\\TouristApp.Blazor\\wwwroot\\js\\script.js",
       "PackagePath": "staticwebassets\\js\\script.js"
     },
     {
-      "Id": "D:\\Works\\RiderProjects\\TouristApp.Frontendzip\\TouristApp.Blazor\\wwwroot\\js\\searchMapScript.js",
+      "Id": "C:\\Users\\kharikrishna\\RiderProjects\\TouristApp.Frontend\\TouristApp.Blazor\\wwwroot\\js\\searchMapScript.js",
       "PackagePath": "staticwebassets\\js\\searchMapScript.js"
     },
     {
