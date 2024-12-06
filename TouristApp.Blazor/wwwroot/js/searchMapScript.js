@@ -2,7 +2,8 @@
 var locations;
 var multiRoute;     
 var points;
-var pointFlags = [];
+const pointFlags = new Map();
+
 function destroyMap() {
     if (myMap != null) {
         myMap.destroy();
@@ -16,6 +17,11 @@ function buildSearchMapRoute(pinpointsJson) {
         points.forEach(point => myMap.geoObjects.remove(point));
     }
     const pinpoints = JSON.parse(pinpointsJson);
+
+    if (pointFlags.size !== 0) {
+        pointFlags.clear();
+    }
+    
     points = pinpoints.map((pinpoint, index) => {
         const placemark = new ymaps.Placemark(pinpoint.coords, {
             balloonContent: createBalloonContent(pinpoint.info, pinpoint.images)
@@ -27,7 +33,9 @@ function buildSearchMapRoute(pinpointsJson) {
             iconImageSize: [30, 42],
             iconImageOffset: [-15, -42]
         });
-        pointFlags[index] = { placemark, flag: false };
+        
+        pointFlags.set([index, placemark], false);
+        
         return placemark;
     });
 
@@ -64,8 +72,6 @@ function buildRouteByCoords(coords) {
             
             route.getPaths().each(function (path) {
                 path.getSegments().each(function (segment) {
-                    let time = segment.getJamsTime() || segment.getDuration();
-                    totalTime += time;
                     let duration = Math.floor(time / 60); 
                     console.log(`Отрезок пути: ${segment.properties.get("text")} - Примерное время: ${duration} мин.`);
                 });
@@ -102,7 +108,7 @@ function getUserLocationOnSearch(userPlacemark) {
                 const userCoords = [position.coords.latitude, position.coords.longitude];
                 userPlacemark.geometry.setCoordinates(userCoords);
                 
-                checkProximity(userCoords[0],userCoords[1]);
+                checkProximityToUser(userCoords[0],userCoords[1]);
                 }, 
             (error) => {
                 console.error("Ошибка получения местоположения: ", error);
@@ -115,14 +121,15 @@ function getUserLocationOnSearch(userPlacemark) {
     }
 }
 
-function checkProximity(lat, lon) {
-    pointFlags.forEach((entry, index) => {
-        const coords = entry.placemark.geometry.getCoordinates();
-
-        if (calculateDistance(lat, lon, coords[0], coords[1]) <= 100 && !entry.flag) {
+function checkProximityToUser(lat, lon) {
+    pointFlags.forEach((value, key, map) => {
+        coords = key[1].geometry.getCoordinates();
+        
+        if (calculateDistance(lat, lon, coords[0], coords[1]) <= 100 && !pointFlags.get(key[0])) {
             alert("Вы рядом с точкой интереса! Предлагаем прослушать информационное аудио!");
-            pointFlags[index].flag = true;
-            entry.flag = true;
+            pointFlags.set(key[0], true);
+
+            return;
         }
     });
 }
