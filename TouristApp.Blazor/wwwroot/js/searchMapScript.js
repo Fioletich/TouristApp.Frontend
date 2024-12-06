@@ -1,7 +1,7 @@
 ﻿var myMap;
 var locations;
 var multiRoute;     
-var points; 
+var points;
              
 function destroyMap() {
     if (myMap != null) {
@@ -84,7 +84,7 @@ function initSearchMap() {
         center: [51.660575, 39.199930], // Воронеж
         zoom: 10
         });
-        
+    
     const userPlacemark = new ymaps.Placemark([0, 0], {
             hintContent: "Ваше местоположение"
     });
@@ -95,18 +95,46 @@ function initSearchMap() {
 
 function getUserLocationOnSearch(userPlacemark) {
     if (navigator.geolocation) {
-            navigator.geolocation.watchPosition(
-                (position) => {
+        navigator.geolocation.watchPosition(
+            (position) => {
                 const userCoords = [position.coords.latitude, position.coords.longitude];
                 userPlacemark.geometry.setCoordinates(userCoords);
-                },
-                (error) => {
-                    console.error("Ошибка получения местоположения:", error);
-                },
-                { enableHighAccuracy: true }
-            );
+                
+                checkProximity()
+                }, 
+            (error) => {
+                console.error("Ошибка получения местоположения: ", error);
+                }, 
+            { enableHighAccuracy: true }
+        );
     } 
     else {
         alert("Ваш браузер не поддерживает геолокацию.");
     }
+}
+
+function checkProximity(lat, lon){
+    points.forEach(point => {
+        const coords = point.geometry.getCoordinates();
+        
+        if (calculateDistance(lat, lon, coords[0], coords[1]) <= 0.1 ) {
+            const info = point.get('balloonContent');
+            //alert...
+    }});
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2){
+    const R = 6371e3;
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+        Math.cos(φ1) * Math.cos(φ2) *
+        Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // Расстояние в метрах
 }

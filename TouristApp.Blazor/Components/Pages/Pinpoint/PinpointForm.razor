@@ -3,7 +3,6 @@
 @using TouristApp.Blazor.Models
 @using TouristApp.Blazor.Models.Pinpoints
 @using TouristApp.Blazor.Services.Categories
-@using TouristApp.Blazor.Services.GeoLocationBroker
 @using TouristApp.Blazor.Services.Pinpoints
 @using TouristApp.Blazor.Services.PinpointCategoryService
 @using TouristApp.Blazor.Services.TouristRoutes
@@ -13,12 +12,13 @@
 @inject ICategoryService CategoryService
 @inject IPinpointCategoryService PinpointCategoryService
 @inject ITouristRouteService TouristRouteService
-@inject IJSRuntime JS
+@inject IJSRuntime Js
 
-<html>
+<html lang="">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <title>Туристические маршруты</title>
 </head>
 
 <body class="flex-column">
@@ -171,7 +171,7 @@
             try
             {
                 await Task.Delay(1000);
-                await JS.InvokeVoidAsync("initPinpointMap", _cts.Token);
+                await Js.InvokeVoidAsync("initPinpointMap", _cts.Token);
             }
             catch (OperationCanceledException)
             {
@@ -206,7 +206,7 @@
                 YCoordinate = idPinpoint.YCoordinate
             };
 
-            await JS.InvokeVoidAsync("buildPinpointMapRoute",
+            await Js.InvokeVoidAsync("buildPinpointMapRoute",
                 JsonSerializer
                     .Serialize(new[] { Mapper.MapJsPinpoint(pinpoint) }));
 

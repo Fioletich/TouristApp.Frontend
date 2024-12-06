@@ -1,5 +1,6 @@
 ﻿@using System.Globalization
 @using System.Text.Json
+@using Microsoft.VisualBasic
 @using TouristApp.Blazor.Models
 @using TouristApp.Blazor.Models.Pinpoints
 @using TouristApp.Blazor.Services.Categories
@@ -196,8 +197,9 @@
                     {
                         jsPinpoint.Info += "\n\n<audio controls=\"controls\">\n       " +
                                            $"     <source src=\"{pinpoint.AudioUrl}\" type=\"audio/mp3\">\n        </audio>";
+                        
                     }
-            
+                    
                     pinPoints.Add(jsPinpoint);
                 }
 
@@ -225,14 +227,14 @@
         }
 
         pinPoints = pinPoints.ToArray().OrderByCoords().ToList();
-        
+
         await JS.InvokeVoidAsync("buildSearchMapRoute", JsonSerializer.Serialize(pinPoints));
     }
 
     public async void Dispose() {
         _isDisposed = true;
         
-        await JS.InvokeVoidAsync("destroyMap");
+        //await JS.InvokeVoidAsync("destroyMap");
         
         _cts?.Cancel();
         _cts?.Dispose();
