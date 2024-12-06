@@ -2,7 +2,7 @@
 var locations;
 var multiRoute;     
 var points;
-             
+var SuggestionChecker = true;             
 function destroyMap() {
     if (myMap != null) {
         myMap.destroy();
@@ -117,8 +117,14 @@ function checkProximity(lat, lon){
     points.forEach(point => {
         const coords = point.geometry.getCoordinates();
         
-        if (calculateDistance(lat, lon, coords[0], coords[1]) <= 0.1 ) {
+        const urlPattern = /https?:\/\/(?:www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}(?:\/[^\s]*)?/g;
+        const match = info.match(urlPattern);
+        
+        if (calculateDistance(lat, lon, coords[0], coords[1]) <= 0.1 && (match && match.length)>0  && SuggestionChecker===true) {
             const info = point.get('balloonContent');
+            alert("ВЫ рядом с точкой интереса! Предлагаем прослушать информационное аудио!");
+            SuggestionChecker = false;
+            setTimeout(() => SuggestionChecker = true, 50000);
             //alert...
     }});
 }
