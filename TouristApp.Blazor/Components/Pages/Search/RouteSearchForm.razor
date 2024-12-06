@@ -177,7 +177,7 @@
             var firstPinpointGeo = new JSPinpoint()
             {
                 Images = new[] { "" },
-                Info = "Маршрут от точки, определенной геолокацией"
+                Info = "Начальная точка, определенная геолокацией"
             };
             firstPinpointGeo.Coords = new decimal[2];
             
@@ -195,8 +195,8 @@
 
                     if (!string.IsNullOrEmpty(pinpoint.AudioUrl))
                     {
-                        jsPinpoint.Info += "\n\n<audio controls=\"controls\">\n       " +
-                                           $"     <source src=\"{pinpoint.AudioUrl}\" type=\"audio/mp3\">\n        </audio>";
+                        jsPinpoint.Info += "<p><audio controls=\"controls\">      " +
+                                           $"     <source src=\"{pinpoint.AudioUrl}\" type=\"audio/mp3\"></audio></p>";
                         
                     }
                     
@@ -219,8 +219,8 @@
 
             if (!string.IsNullOrEmpty(pinpoint.AudioUrl))
             {
-                jsPinpoint.Info += "\n\n<audio controls=\"controls\">\n       " +
-                                   $"     <source src=\"{pinpoint.AudioUrl}\" type=\"audio/mp3\">\n        </audio>";
+                jsPinpoint.Info += "<p><audio controls=\"controls\">      " +
+                                   $"     <source src=\"{pinpoint.AudioUrl}\" type=\"audio/mp3\"></audio></p>";
             }
             
             pinPoints.Add(jsPinpoint);

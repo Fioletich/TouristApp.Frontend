@@ -24,7 +24,7 @@ function buildSearchMapRoute(pinpointsJson) {
     
     points = pinpoints.map((pinpoint, index) => {
         const placemark = new ymaps.Placemark(pinpoint.coords, {
-            balloonContent: createBalloonContent(pinpoint.info, pinpoint.images)
+            balloonContent: pinpoint.info,
         }, {
             balloonCloseButton: true,
             hideIconOnBalloonOpen: false,
@@ -125,8 +125,12 @@ function checkProximityToUser(lat, lon) {
     pointFlags.forEach((value, key, map) => {
         coords = key[1].geometry.getCoordinates();
         
+        //&& key[0] !== 0 дописать в условие 
         if (calculateDistance(lat, lon, coords[0], coords[1]) <= 100 && !pointFlags.get(key[0])) {
-            alert("Вы рядом с точкой интереса! Предлагаем прослушать информационное аудио!");
+            setTimeout(() => {
+                alert("Вы рядом с точкой интереса! Предлагаем прослушать информационное аудио! " + 
+                key[1].properties.get('balloonContent'));
+            }, 500); 
             pointFlags.set(key[0], true);
 
             return;

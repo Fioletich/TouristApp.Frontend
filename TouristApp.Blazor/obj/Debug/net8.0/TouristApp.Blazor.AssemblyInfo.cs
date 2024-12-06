@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TouristApp.Blazor")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a1e9e8cba67f73a8fc95cc77c550a58ae8aadab0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e26af85aa4059cf40ad17d0e08cdc93e68744804")]
 [assembly: System.Reflection.AssemblyProductAttribute("TouristApp.Blazor")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TouristApp.Blazor")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
