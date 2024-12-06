@@ -124,15 +124,15 @@ function getUserLocationOnSearch(userPlacemark) {
 function checkProximityToUser(lat, lon) {
     pointFlags.forEach((value, key, map) => {
         coords = key[1].geometry.getCoordinates();
-        
+        const balloonContent = key[1].properties.get('balloonContent');
+        const pointDescription = balloonContent.split(':')[0];
         //&& key[0] !== 0 дописать в условие 
-        if (calculateDistance(lat, lon, coords[0], coords[1]) <= 100 && !pointFlags.get(key[0])) {
+        if (calculateDistance(lat, lon, coords[0], coords[1]) <= 100 && !pointFlags.get(key[0])&&balloonContent.includes('audio')&& key[0] !== 0) {
             setTimeout(() => {
-                alert("Вы рядом с точкой интереса! Предлагаем прослушать информационное аудио! " + 
-                key[1].properties.get('balloonContent'));
+                alert("Вы рядом с точкой интереса! Предлагаем прослушать информационное аудио! " + " Текущая точка: "+
+                pointDescription)
             }, 500); 
             pointFlags.set(key[0], true);
-
             return;
         }
     });
