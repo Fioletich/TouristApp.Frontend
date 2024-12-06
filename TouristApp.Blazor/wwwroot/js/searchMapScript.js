@@ -99,6 +99,7 @@ function getUserLocationOnSearch(userPlacemark) {
                 (position) => {
                 const userCoords = [position.coords.latitude, position.coords.longitude];
                 userPlacemark.geometry.setCoordinates(userCoords);
+                userPlacemark.geometry.setCoordinates([x,y]);
                 },
                 (error) => {
                     console.error("Ошибка получения местоположения:", error);
@@ -109,4 +110,58 @@ function getUserLocationOnSearch(userPlacemark) {
     else {
         alert("Ваш браузер не поддерживает геолокацию.");
     }
+}
+
+function checkProximity(x,y){
+    const distance = calculateDistance(x,y);
+    points.forEach(point=>{if (distance<=0.1){
+        const info = point.get('balloonContent'); 
+        const audioUrl = extractAudioUrl(info);
+        
+        if(audioUrl){
+            playAudio(audioUrl);
+        }
+    }})
+}
+
+function extractAudioUrl(info) {
+    const urlPattern = /https?:\/\/(?:www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}(?:\/[^\s]*)?/g;
+    const match = info.match(urlPattern);
+
+    if (match && match.length > 0) {
+        return match[0];
+    }
+    return null;
+}
+function calculateDistance(x,y){
+    return sqrt(x*x + y*y);
+}
+
+function playAudio(audioUrl){
+    if (!audioPlayed){
+        showPopup(audioUrl);
+        audioPlayed = true;
+        
+        setTimeout(()=>{audioPlayed = false;}, 50000);
+    }
+}
+
+function showPopup(audioUrl){
+    const popUp=document.getElementById('audPopUp');
+    const Player=document.getElementById('Player');
+    const audsrc=document.getElementById('Source');
+    
+    popUpTtl.textContent=title;
+    audsrc.src=audioUrl;
+    Player.load();
+    Player.play();
+    
+    popUp.classList.remove('hidden');
+}
+
+function hidePopup(){
+    const popUp=document.getElementById('audPopUp');
+    const Player=document.getElementById('Player');
+    Player.stop();
+    popUp.classList.add('hidden');
 }
