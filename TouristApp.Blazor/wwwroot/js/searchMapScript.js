@@ -2,35 +2,37 @@
 var locations;
 var multiRoute;     
 var points;
-var SuggestionChecker = true;             
+var pointFlags = [];
 function destroyMap() {
     if (myMap != null) {
         myMap.destroy();
         myMap = null;
     }
-}  
+}
 
 function buildSearchMapRoute(pinpointsJson) {
     if (multiRoute) {
-        myMap.geoObjects.remove(multiRoute);   
-        points.forEach(point => myMap.geoObjects.remove(point))
+        myMap.geoObjects.remove(multiRoute);
+        points.forEach(point => myMap.geoObjects.remove(point));
     }
-
-    const pinpoints = JSON.parse(pinpointsJson)
-    points = pinpoints.map(pinpoint => {
-        return new ymaps.Placemark(pinpoint.coords, {
+    const pinpoints = JSON.parse(pinpointsJson);
+    points = pinpoints.map((pinpoint, index) => {
+        const placemark = new ymaps.Placemark(pinpoint.coords, {
             balloonContent: createBalloonContent(pinpoint.info, pinpoint.images)
-            }, {
-                balloonCloseButton: true,
-                hideIconOnBalloonOpen: false,
-                iconLayout: 'default#image',
-                iconImageHref: 'https://cdn-icons-png.flaticon.com/512/252/252025.png',
-                iconImageSize: [30, 42],
-                iconImageOffset: [-15, -42]
-                });
-    });                   
-    points.forEach(point => myMap.geoObjects.add(point))
-            
+        }, {
+            balloonCloseButton: true,
+            hideIconOnBalloonOpen: false,
+            iconLayout: 'default#image',
+            iconImageHref: 'https://cdn-icons-png.flaticon.com/512/252/252025.png',
+            iconImageSize: [30, 42],
+            iconImageOffset: [-15, -42]
+        });
+        pointFlags[index] = { placemark, flag: false };
+        return placemark;
+    });
+
+    points.forEach(point => myMap.geoObjects.add(point));
+
     buildRouteByCoords(pinpoints.map(pinpoint => pinpoint.coords));
 }
 
@@ -100,7 +102,7 @@ function getUserLocationOnSearch(userPlacemark) {
                 const userCoords = [position.coords.latitude, position.coords.longitude];
                 userPlacemark.geometry.setCoordinates(userCoords);
                 
-                checkProximity()
+                checkProximity(userCoords[0],userCoords[1]);
                 }, 
             (error) => {
                 console.error("Ошибка получения местоположения: ", error);
@@ -113,20 +115,16 @@ function getUserLocationOnSearch(userPlacemark) {
     }
 }
 
-function checkProximity(lat, lon){
-    points.forEach(point => {
-        const coords = point.geometry.getCoordinates();
-        
-        const urlPattern = /https?:\/\/(?:www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}(?:\/[^\s]*)?/g;
-        const match = info.match(urlPattern);
-        
-        if (calculateDistance(lat, lon, coords[0], coords[1]) <= 0.1 && (match && match.length)>0  && SuggestionChecker===true) {
-            const info = point.get('balloonContent');
-            alert("ВЫ рядом с точкой интереса! Предлагаем прослушать информационное аудио!");
-            SuggestionChecker = false;
-            setTimeout(() => SuggestionChecker = true, 50000);
-            //alert...
-    }});
+function checkProximity(lat, lon) {
+    pointFlags.forEach((entry, index) => {
+        const coords = entry.placemark.geometry.getCoordinates();
+
+        if (calculateDistance(lat, lon, coords[0], coords[1]) <= 100 && !entry.flag) {
+            alert("Вы рядом с точкой интереса! Предлагаем прослушать информационное аудио!");
+            pointFlags[index].flag = true;
+            entry.flag = true;
+        }
+    });
 }
 
 function calculateDistance(lat1, lon1, lat2, lon2){
